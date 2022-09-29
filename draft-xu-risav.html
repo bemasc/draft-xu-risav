@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>An RPKI and IPsec-based AS-to-AS Approach for Source Address Validation</title>
+<meta content="Ke Xu" name="author">
+<meta content="Jianping Wu" name="author">
+<meta content="Yangfei Guo" name="author">
+<meta content="Benjamin M. Schwartz" name="author">
+<meta content="Haiyang (Henry) Wang" name="author">
+<meta content="
+       This document identifies a need for static-static ECDH, RPKI, and IPsec based AS-to-AS approach for detection and mitigation of inter-AS source address validation (RISAV). The RISAV aims to reusing existing protocols to provide a light-weight packet's tag and with the incremental deployability to significantly reduce the spoofed source address in the Internet. 
+    " name="description">
+<meta content="xml2rfc 3.14.2" name="generator">
+<meta content="Internet-Draft" name="keyword">
+<meta content="draft-xu-risav-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.14.2
+    Python 3.10.5
+    appdirs 1.4.4
+    ConfigArgParse 1.5.3
+    google-i18n-address 2.5.2
+    html5lib 1.1
+    intervaltree 3.1.0
+    Jinja2 3.1.2
+    kitchen 1.2.6
+    lxml 4.9.1
+    MarkupSafe 2.1.1
+    pycountry 22.3.5
+    PyYAML 6.0
+    requests 2.27.1
+    setuptools 59.4.0
+    six 1.16.0
+-->
+<link href="draft-xu-risav.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Cabin Condensed", sans-serif;
+  font-weight: 600;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1#title {
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+}
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+}
+:is(ol, ul) :is(ol, ul) {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  line-height: 100%;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+}
+dl > dt {
+  float: left;
+  margin-right: 1em;
+  min-width: 20ch;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+dl > dd {
+  margin-bottom: .8em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:first-child, .break:first-child + *) {
+  margin-top: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:last-child) {
+  margin-bottom: 0;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+}
+dl .break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href].selfRef {
+  color: var(--text-color);
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
+  pre, svg {
+    display: inline-block;
+    overflow-x: auto;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+}
+a.pilcrow[href] { color: var(--pilcrow-weak); }
+a.pilcrow[href]:hover { text-decoration: none; }
+@media not print {
+  :hover > a.pilcrow {
+    opacity: 1;
+  }
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
+    background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: 14.5px;
+}
+.role {
+  font-variant: all-small-caps;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+}
+#identifiers dt {
+  width: var(--identifier-width);
+  min-width: var(--identifier-width);
+  clear: left;
+  float: left;
+  text-align: right;
+}
+#identifiers dd {
+  margin: 0;
+  margin-left: calc(1em + var(--identifier-width)) !important;
+  min-width: 5em;
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+#toc nav ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+#toc nav li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+#toc a.xref {
+  white-space: normal;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 7em;
+}
+.references dt:target::before {
+  content: "⇒";
+  width: 15px;
+  margin: 0 10px 0 -25px;
+}
+.references dd {
+  margin-left: 8em !important;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc.active {
+      opacity: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 8px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active nav {
+    display: block;
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin-top: 2px;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  #toc nav > ul  {
+    margin-bottom: 2em;
+  }
+  #toc ul {
+    margin: 0 0 0 4px;
+    font-size: var(--small-font-size);
+  }
+  #toc ul :is(p, li) {
+    margin: 2px 0;
+    line-height: 22px;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Changes introduced to fix issues found during implementation */
+
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin: 8px 0.5em 0;
+}
+
+/* Provide styling for table cell text alignment */
+table .text-left {
+  text-align: left;
+}
+table .text-center {
+  text-align: center;
+}
+table .text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 20em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  dd {
+    page-break-before: avoid;
+  }
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
+  stroke: var(--text-color);
+}
+svg :is([stroke="white"], [stroke^="#fff"]) {
+  stroke: var(--background-color);
+}
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
+  fill: var(--text-color);
+}
+svg :is([stroke="fill"], [fill^="#fff"]) {
+  fill: var(--background-color);
+}
+</style>
+
+</head>
+<body>
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">RISAV</td>
+<td class="right">September 2022</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Xu, et al.</td>
+<td class="center">Expires 3 April 2023</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Network Working Group</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-xu-risav-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2022-09-30" class="published">30 September 2022</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2023-04-03">3 April 2023</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">K. Xu</div>
+<div class="org">Tsinghua University</div>
+</div>
+<div class="author">
+      <div class="author-name">J. Wu</div>
+<div class="org">Tsinghua University</div>
+</div>
+<div class="author">
+      <div class="author-name">Y. Guo</div>
+<div class="org">Zhongguancun Laboratory</div>
+</div>
+<div class="author">
+      <div class="author-name">B. M. Schwartz</div>
+<div class="org">Google LLC</div>
+</div>
+<div class="author">
+      <div class="author-name">H. (Henry). Wang</div>
+<div class="org">The University of Minnesota at Duluth</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">An RPKI and IPsec-based AS-to-AS Approach for Source Address Validation</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document identifies a need for static-static ECDH, RPKI, and IPsec based AS-to-AS approach for detection and mitigation of inter-AS source address validation (RISAV). The RISAV aims to reusing existing protocols to provide a light-weight packet's tag and with the incremental deployability to significantly reduce the spoofed source address in the Internet.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-discussion-venues">
+<a href="#name-discussion-venues" class="section-name selfRef">Discussion Venues</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">Source for this draft and an issue tracker can be found at
+    <span><a href="https://github.com/bemasc/draft-xu-risav">https://github.com/bemasc/draft-xu-risav</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 3 April 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2022 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction" class="xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="xref">1.1</a>.  <a href="#name-requirements-language" class="xref">Requirements Language</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-overview" class="xref">Overview</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-control-plane" class="xref">Control Plane</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="xref">3.1</a>.  <a href="#name-asn-prefix-relationship-ann" class="xref">ASN-Prefix relationship announcement</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="xref">3.2</a>.  <a href="#name-tag-management" class="xref">Tag management</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="xref">3.3</a>.  <a href="#name-asn-tag-relationship-announ" class="xref">ASN-Tag relationship announcement</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-data-plane" class="xref">Data Plane</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="xref">4.1</a>.  <a href="#name-incremental-deployment" class="xref">Incremental deployment</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-security-consideration" class="xref">Security Consideration</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="xref">5.1</a>.  <a href="#name-compatibility" class="xref">Compatibility</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="xref">5.2</a>.  <a href="#name-key-guessing-and-cracking" class="xref">Key Guessing and Cracking</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>.  <a href="#name-iana-consideration" class="xref">IANA Consideration</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>.  <a href="#name-normative-references" class="xref">Normative References</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="xref"></a><a href="#name-authors-addresses" class="xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">Source address spoofing has been identified years ago at <span>[<a href="#RFC2827" class="xref">RFC2827</a>]</span>, and <span>[<a href="#RFC5210" class="xref">RFC5210</a>]</span> has proposed an Source Address Validation Architecture (SAVA) to alleviate such concerns. SAVA classifies this solution into three layers: Access Network, Intra-AS, and Inter-AS. The Inter-AS concerns the SAV at the AS boundaries. It is more challenging for developing the inter-AS source address validation approach because different ASes run different policies in different ISPs independently. It requires the different ASes to collaborate to verify the source address. The inter-AS SAV is more effective than Access or Intra-AS due to its better cost-effectiveness. However, over years of effort, inter-AS source address validation deployment is still not optimistic. An important reason is the difficulty of balancing the clear security benefits of partial implementations with the scalability of large-scale deployments. uRPF <span>[<a href="#RFC5635" class="xref">RFC5635</a>]</span> <span>[<a href="#RFC8704" class="xref">RFC8704</a>]</span>, for example, is a routing-based schemes filter spoofing source address's traffic, which may result in a lack of security benefits due to the dynamic nature of routing or incomplete information caused by partial deployments.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">This document provides a static-static ECDH, RPKI and IPsec-based <span>[<a href="#RFC4301" class="xref">RFC4301</a>]</span> inter-AS approach to source address validation (RISAV). RISAV is a cryptography-based SAV mechanism to reduce the spoofing source address. It combines static-static ECDH (Elliptic Curve Diffie--Hellman key Exchange), RPKI (Resource Public Key Infrastructure), and IPsec (IP Security). RPKI provides the reflection relationship between AS numbers (ASN) and IP prefixes. ECDH negotiates between two ASes with the Security Association (SA) which contains the algorithm, secret key generating material, and IPsec packet type, and so forth. IPsec is designed for secure the Internet at the IP layer. It introduces two protocols, one is AH (authentication header) <span>[<a href="#RFC4302" class="xref">RFC4302</a>]</span> which provides authenticity of the whole packet, including the source address. The other is ESP (IP Encapsulating Security Payload) <span>[<a href="#RFC4303" class="xref">RFC4303</a>]</span> which encrypts the whole packet's payload.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<div id="requirements-language">
+<section id="section-1.1">
+        <h3 id="name-requirements-language">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-requirements-language" class="section-name selfRef">Requirements Language</a>
+        </h3>
+<p id="section-1.1-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="overview">
+<section id="section-2">
+      <h2 id="name-overview">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
+      </h2>
+<p id="section-2-1">The goal of this section is to provides the high level description of how RISAV works. RISAV is a cryptography-b  ased inter-AS source address validation method that guarantees security benefits at partial deployment. RISAV uses static-static ECDH
+
+1. RPKI process. The five Reginal Internet Registry (RIR) would be authorized by IANA. They use their root certificate to sign the Certificate Authority (CA) certificate of the Local Internet Registry (LIR). And after that LIR would use a CA certificate to authorize indirectly the Internet Service Provider (ISP) or directly the Autonomous System (AS). When they obtain their own CA certificate, the AS would sign an End Entity (EE) certificate with a Route Origin Authorisation (ROA) which is a cryptographically signed object that states which AS are authorized to originate a certain prefix. Such the reflection of ASN relationship with IP prefixes would be broadcast to the network.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-2-2">
+<li id="section-2-2.1">Sign ASBR EE certificate. This EE certificate is just like the BGPsec Router Certificate defined in <span>[<a href="#RFC8209" class="xref">RFC8209</a>]</span>. The ASBR would need its own EE certificate for and only for generating and verifying the signature in the AH header directly or indirectly.<a href="#section-2-2.1" class="pilcrow">¶</a>
+</li>
+        <li id="section-2-2.2">IKE process. Before IPsec establishing, the SA must be reached an agreement. There are two ways to negotiate the SA. One is mutual config all the parameters and the other one is using IKE for dynamic negotiating these parameters. Currently used is IKE version 2 (IKEv2, for short using IKE below). Typically, IKE would produce IKE SA in the IKE_SA_INIT exchange and IPsec SA in the IKE_AUTH exchange. This will be done in an ACS.<a href="#section-2-2.2" class="pilcrow">¶</a>
+</li>
+        <li id="section-2-2.3">SA or tag delivery. When all negotiations are done, the IPsec is established. If the ACS is an ASBR actually, it would deliver SA to the other ASBR in this AS. Otherwise, it would deliver the tags generated by the state machine. This delivery will be processed in a secure channel just like using IPsec ESP.<a href="#section-2-2.3" class="pilcrow">¶</a>
+</li>
+        <li id="section-2-2.4">IPsec AH communication. It uses IPsec AH for authentication of the IP source address.  IPsec is often used in tunnel mode as the IPsec VPN. Here, It expands the gateway to the AS border router (ASBR). When two ends x and y in AS X and Y respectively are communicating, the packet from x arriving at its ASBR RA would use the established IPsec channel for adding the representative tag. After the packet arrives at ASBR RB of AS Y, it would be inspected by comparing the consistency of the tag. The tag will be encapsulated in the ICV field in AH.<a href="#section-2-2.4" class="pilcrow">¶</a>
+</li>
+      </ol>
+<p id="section-2-3">A typical workflow of RISAV is shown in <a href="#figure1" class="xref">Figure 1</a>.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<span id="name-risav-workflow-example"></span><div id="figure1">
+<figure id="figure-1">
+        <div class="alignLeft art-text artwork" id="section-2-4.1">
+<pre>
+                            +--------------+
+                            |     IANA     |
+                            +--------------+
+                                   |--------------------------+
+                                   V                          |
+                            +--------------+                  |
+                            |      RIR     |                  |
+                            +--------------+                  |
+                           /                \-----------------+-1. signed CA
+                          V                  V                |  certificate
+              +--------------+               +--------------+ |
+              |     LIR1     |               |     LIR2     | |
+              +--------------+               +--------------+ |
+              /                                             \-+
+             V   +------ 2. signed EE certificate -------+   V
++--------------+ |                                       | +--------------+
+|              | |    --------------------------------   | |              |
+|              | |          3. IKE negotiation           | |              |
+|     AS A     | |    --------------------------------   | |     AS B     |
+|              | V                                       V |              |
+|           ########  --------------------------------  ########          |
+|           # ASBR #           4. SA Deliver            # ASBR #          |
+|           ########  --------------------------------  ########          |
+|              |                                           |   Prefix Y   |
+|   Prefix X   |      +++++++++++++++++++++++++++++++++    | Public Key B |
+| Public Key A |           5. data transmission            |              |
+|              |              using IPsec AH               |              |
+|              |      +++++++++++++++++++++++++++++++++    |              |
++--------------+                                           +--------------+
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-risav-workflow-example" class="selfRef">RISAV workflow example.</a>
+        </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="control-plane">
+<section id="section-3">
+      <h2 id="name-control-plane">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-control-plane" class="section-name selfRef">Control Plane</a>
+      </h2>
+<p id="section-3-1">The functions of the control plane of RISAV include ASN-Prefix relationship announcement, Tag management, and ASN-Tag relationship announcement.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<div id="asn-prefix-relationship-announcement">
+<section id="section-3.1">
+        <h3 id="name-asn-prefix-relationship-ann">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-asn-prefix-relationship-ann" class="section-name selfRef">ASN-Prefix relationship announcement</a>
+        </h3>
+<p id="section-3.1-1">RISAV uses RPKI to manage the relationship between ASN and IP prefixes. So when one AS wants to deploy RISAV, it should implement RPKI first. When RPKI is deployed, the validated ROA cache <span class="bcp14">SHOULD</span> be sent to the ASBR for routing and forwarding packets.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">The ROA whose status is valid can be used with IPsec to prevent source address spoofing. That means only the prefix contained in valid ROA would valuably and correctly be protected.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">For more information about RPKI, one can refer to <span>[<a href="#RFC6480" class="xref">RFC6480</a>]</span>.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="tag-management">
+<section id="section-3.2">
+        <h3 id="name-tag-management">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-tag-management" class="section-name selfRef">Tag management</a>
+        </h3>
+<p id="section-3.2-1">Before introducing the ASN-Tag relationship announcement, it shall be described what is a tag and how it is generated.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">A tag is a variable bit-string that is generated at an entity in AS. This entity is AS Control Server (ACS). The tag is used with the authentication algorithm to generate the signature. That means the tag is the key to the authentication. When communicating, the tag would not be directly tagged to the IPsec AH of the packet, replacing it with a signature instead, which will be different with different packets. One AS <span class="bcp14">SHOULD</span> have at most two tags in effect in the same bound simultaneously for Key-Rover.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+<p id="section-3.2-3">It has two ways for an ACS to generate tags. One is using a state machine. The state machine runs and triggers the state transition when time is up. The tag is generated in the process of state transition as the side product. The two ACS in peer AS respectively before data transmission will maintain one state machine pair for each bound. The state machine runs simultaneously after the initial state, state transition algorithm, and state transition interval are negotiated, thus they generate the same tag at the same time. Time triggers state transition which means the ACS <span class="bcp14">MUST</span> synchronize the time to the same time base using like NTP defined in <span>[<a href="#RFC5905" class="xref">RFC5905</a>]</span>.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.2-4">The other way to generate a tag is by applying the original SA. The IPsec channel is established when the IKE_AUTH process is finished. SA includes the specified AH, the authentication algorithm, the key used for authentication, etc. So two IKE entities have negotiated SA. All ASBR in one AS <span class="bcp14">SHOULD</span> use the same SA.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
+<p id="section-3.2-5">When it chooses to use a logical ACS, one AS will elect one distinguished ASBR as the ACS. The distinguished ASBR acting as an ACS will represent the whole AS to communicate with peer AS's ACS. This election takes place prior to the IKE negotiation. An ASBR <span class="bcp14">MUST</span> be a BGP speaker before it is elected as the distinguished ASBR. This is an <span class="bcp14">OPTIONAL</span> operation to use this logical ACS.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="asn-tag-relationship-announcement">
+<section id="section-3.3">
+        <h3 id="name-asn-tag-relationship-announ">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-asn-tag-relationship-announ" class="section-name selfRef">ASN-Tag relationship announcement</a>
+        </h3>
+<p id="section-3.3-1">Corresponding to the tag generating, it also has two ways to announce the ASN-Tag binding relationship. The first is to deliver the generated tags and the second is to deliver the original SA.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2">Thus, there must be a header format definition to transfer these tags and SA. In RISAV, it uses the header and payload formats defined in <span>[<a href="#RFC5996" class="xref">RFC5996</a>]</span>. Meanwhile, there are some almost negligible changes to the formats. For the tag generation method, it <span class="bcp14">MUST</span> be to specify the initial state and initial state length of the state machine, the identifier of a state machine, state transition interval, length of generated Tag, and Tag. For the SA, they will transfer all these payloads in a secure channel between ACS and ASBRs, for instance, in ESP <span>[<a href="#RFC4303" class="xref">RFC4303</a>]</span>. It is <span class="bcp14">RECOMMENDED</span> to transfer the tags rather than the SA for security and efficiency considerations. The initial state and its length can be specified at the Key Exchange Payload with nothing to be changed. The state machine identifier is the SPI value as the SPI value is uniquely in RISAV. The state transition interval and length of generated Tag should be negotiated by the pair ACS, which will need to allocate one SA attribute. The generated Tag will be sent from ACS to ASBR in a secure channel which <span class="bcp14">MAY</span> be, for example, ESP <span>[<a href="#RFC4303" class="xref">RFC4303</a>]</span>.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="data-plane">
+<section id="section-4">
+      <h2 id="name-data-plane">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-data-plane" class="section-name selfRef">Data Plane</a>
+      </h2>
+<p id="section-4-1">The functions of the data plane of RISAV include source address checking and tag processing.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">RISAV redesign the original AH format as shown in <a href="#fig2" class="xref">Figure 2</a>.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<span id="name-risav-ah-format"></span><div id="fig2">
+<figure id="figure-2">
+        <div class="alignLeft art-text artwork" id="section-4-3.1">
+<pre>
+                     1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Next Header   |  Payload Len  |          RESERVED             |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                 Security Parameters Index (SPI)               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                     Sequence Number Field                     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Prefix Length |  SIG Length   |           RESERVED            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Signature - SIG (variable)                 |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-risav-ah-format" class="selfRef">RISAV AH Format.</a>
+        </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlParallel" id="section-4-4">
+        <dt id="section-4-4.1">Prefix Length:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-4.2">
+          <p id="section-4-4.2.1">The prefix length in valid ROA matched the IP source address. It presents the valid length of the IP source address prefix.<a href="#section-4-4.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-4-4.3">SIG Length:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-4.4">
+          <p id="section-4-4.4.1">The length of the variable signature. It is the octets in Signature.<a href="#section-4-4.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-4-4.5">Signature:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-4.6">
+          <p id="section-4-4.6.1">The result of the authentication algorithm with the key.<a href="#section-4-4.6.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-4-5">All the ASBRs of the AS are <span class="bcp14">REQUIRED</span> to enable RISAV. And RISAV can <span class="bcp14">OPTIONAL</span> cooperate with intra-domain SAV and access-layer SAV, such as <span>[<a href="#RFC8704" class="xref">RFC8704</a>]</span> or SAVI <span>[<a href="#RFC7039" class="xref">RFC7039</a>]</span>. Only when intra-domain or access-layer SAV, if deployed, check passed can the packet process and forward correctly. It uses SPI for destination ASBR to locate the SA uniquely when processing the AH header in RISAV.<a href="#section-4-5" class="pilcrow">¶</a></p>
+<p id="section-4-6">As defined in <span>[<a href="#RFC4301" class="xref">RFC4301</a>]</span>, the Security Association Database (SAD) stores all the SAs. One data item in SAD includes an Authentication algorithm and corresponding key when AH is supported. The authentication algorithm could be HMAC-MD5, HMAC-SHA-1, or others. As authenticating the whole packet causes a heavy burden in the computation, RISAV defines that it only authenticates the IP source address, IP destination address, and the IP prefix length in ROA, SPI, and Sequence Number Field. The eventual signature is the hash of the 5-tuple before with the key/tag.<a href="#section-4-6" class="pilcrow">¶</a></p>
+<p id="section-4-7">When a packet arrives at the source ASBR, it will be checked with the destination address by this ASBR first. If the destination address is in the protection range of RISAV, the packet will be checked by the source address next. If the source address belongs to the AS in which the ASBR locates, the packet needs to be filled in the AH header.<a href="#section-4-7" class="pilcrow">¶</a></p>
+<p id="section-4-8">When a packet arrives at the destination ASBR, it will be checked the destination address and the source address orderly. If the destination belongs to the AS that the destination ASBR locates in and the source address seats in the RISAV protection area, the packet needs to be inspected with the AH header.<a href="#section-4-8" class="pilcrow">¶</a></p>
+<div id="incremental-deployment">
+<section id="section-4.1">
+        <h3 id="name-incremental-deployment">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-incremental-deployment" class="section-name selfRef">Incremental deployment</a>
+        </h3>
+<p id="section-4.1-1">So far, IPsec is often used as a VPN which is a technology for private network access through public networks. In the final analysis, IPsec is a highly cost-effective ratio mechanism. Original IPsec AH needs to authenticate the whole constant part of a packet so that it needs to spend amounts of time finding and processing unchangeable fields in the packet. However, RISAV only needs to find a few changeless fields to authenticate the packet decreasing the cost dramatically.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="security-consideration">
+<section id="section-5">
+      <h2 id="name-security-consideration">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-security-consideration" class="section-name selfRef">Security Consideration</a>
+      </h2>
+<div id="compatibility">
+<section id="section-5.1">
+        <h3 id="name-compatibility">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-compatibility" class="section-name selfRef">Compatibility</a>
+        </h3>
+<p id="section-5.1-1">When using RISAV, it WOULD be used at last when all other IPsec SA does not match. Such that, RISAV is comparable with the current IPsec Security Architecture. It <span class="bcp14">SHOULD</span> be guaranteed that the preference of RISAV is lower than other IPsec. So it may require the special SPI filled.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="key-guessing-and-cracking">
+<section id="section-5.2">
+        <h3 id="name-key-guessing-and-cracking">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-key-guessing-and-cracking" class="section-name selfRef">Key Guessing and Cracking</a>
+        </h3>
+<p id="section-5.2-1">For resisting label-based reply attacks, the eventual signature used in a packet is generated by the ASBR by hashing a few fields including the IP source address, IP destination address, and the IP prefix length in ROA, SPI, and Sequence Number Field. The attacker could guess the signature and crack that key using brute force. Nevertheless, it depends on the irreversibility of a hash function to prevent back stepping the key from the signature. Furthermore, to decrease such probability, the key used in generating the signature will be updated periodically.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="iana-consideration">
+<section id="section-6">
+      <h2 id="name-iana-consideration">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-iana-consideration" class="section-name selfRef">IANA Consideration</a>
+      </h2>
+<p id="section-6-1">TBD.<a href="#section-6-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<section id="section-7">
+      <h2 id="name-normative-references">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+      </h2>
+<dl class="references">
+<dt id="RFC2119">[RFC2119]</dt>
+      <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2827">[RFC2827]</dt>
+      <dd>
+<span class="refAuthor">Ferguson, P.</span> and <span class="refAuthor">D. Senie</span>, <span class="refTitle">"Network Ingress Filtering: Defeating Denial of Service Attacks which employ IP Source Address Spoofing"</span>, <span class="seriesInfo">BCP 38</span>, <span class="seriesInfo">RFC 2827</span>, <span class="seriesInfo">DOI 10.17487/RFC2827</span>, <time datetime="2000-05" class="refDate">May 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2827">https://www.rfc-editor.org/info/rfc2827</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4301">[RFC4301]</dt>
+      <dd>
+<span class="refAuthor">Kent, S.</span> and <span class="refAuthor">K. Seo</span>, <span class="refTitle">"Security Architecture for the Internet Protocol"</span>, <span class="seriesInfo">RFC 4301</span>, <span class="seriesInfo">DOI 10.17487/RFC4301</span>, <time datetime="2005-12" class="refDate">December 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4301">https://www.rfc-editor.org/info/rfc4301</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4302">[RFC4302]</dt>
+      <dd>
+<span class="refAuthor">Kent, S.</span>, <span class="refTitle">"IP Authentication Header"</span>, <span class="seriesInfo">RFC 4302</span>, <span class="seriesInfo">DOI 10.17487/RFC4302</span>, <time datetime="2005-12" class="refDate">December 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4302">https://www.rfc-editor.org/info/rfc4302</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4303">[RFC4303]</dt>
+      <dd>
+<span class="refAuthor">Kent, S.</span>, <span class="refTitle">"IP Encapsulating Security Payload (ESP)"</span>, <span class="seriesInfo">RFC 4303</span>, <span class="seriesInfo">DOI 10.17487/RFC4303</span>, <time datetime="2005-12" class="refDate">December 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4303">https://www.rfc-editor.org/info/rfc4303</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5210">[RFC5210]</dt>
+      <dd>
+<span class="refAuthor">Wu, J.</span>, <span class="refAuthor">Bi, J.</span>, <span class="refAuthor">Li, X.</span>, <span class="refAuthor">Ren, G.</span>, <span class="refAuthor">Xu, K.</span>, and <span class="refAuthor">M. Williams</span>, <span class="refTitle">"A Source Address Validation Architecture (SAVA) Testbed and Deployment Experience"</span>, <span class="seriesInfo">RFC 5210</span>, <span class="seriesInfo">DOI 10.17487/RFC5210</span>, <time datetime="2008-06" class="refDate">June 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5210">https://www.rfc-editor.org/info/rfc5210</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5635">[RFC5635]</dt>
+      <dd>
+<span class="refAuthor">Kumari, W.</span> and <span class="refAuthor">D. McPherson</span>, <span class="refTitle">"Remote Triggered Black Hole Filtering with Unicast Reverse Path Forwarding (uRPF)"</span>, <span class="seriesInfo">RFC 5635</span>, <span class="seriesInfo">DOI 10.17487/RFC5635</span>, <time datetime="2009-08" class="refDate">August 2009</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5635">https://www.rfc-editor.org/info/rfc5635</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5905">[RFC5905]</dt>
+      <dd>
+<span class="refAuthor">Mills, D.</span>, <span class="refAuthor">Martin, J., Ed.</span>, <span class="refAuthor">Burbank, J.</span>, and <span class="refAuthor">W. Kasch</span>, <span class="refTitle">"Network Time Protocol Version 4: Protocol and Algorithms Specification"</span>, <span class="seriesInfo">RFC 5905</span>, <span class="seriesInfo">DOI 10.17487/RFC5905</span>, <time datetime="2010-06" class="refDate">June 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5905">https://www.rfc-editor.org/info/rfc5905</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5996">[RFC5996]</dt>
+      <dd>
+<span class="refAuthor">Kaufman, C.</span>, <span class="refAuthor">Hoffman, P.</span>, <span class="refAuthor">Nir, Y.</span>, and <span class="refAuthor">P. Eronen</span>, <span class="refTitle">"Internet Key Exchange Protocol Version 2 (IKEv2)"</span>, <span class="seriesInfo">RFC 5996</span>, <span class="seriesInfo">DOI 10.17487/RFC5996</span>, <time datetime="2010-09" class="refDate">September 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5996">https://www.rfc-editor.org/info/rfc5996</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6480">[RFC6480]</dt>
+      <dd>
+<span class="refAuthor">Lepinski, M.</span> and <span class="refAuthor">S. Kent</span>, <span class="refTitle">"An Infrastructure to Support Secure Internet Routing"</span>, <span class="seriesInfo">RFC 6480</span>, <span class="seriesInfo">DOI 10.17487/RFC6480</span>, <time datetime="2012-02" class="refDate">February 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6480">https://www.rfc-editor.org/info/rfc6480</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7039">[RFC7039]</dt>
+      <dd>
+<span class="refAuthor">Wu, J.</span>, <span class="refAuthor">Bi, J.</span>, <span class="refAuthor">Bagnulo, M.</span>, <span class="refAuthor">Baker, F.</span>, and <span class="refAuthor">C. Vogt, Ed.</span>, <span class="refTitle">"Source Address Validation Improvement (SAVI) Framework"</span>, <span class="seriesInfo">RFC 7039</span>, <span class="seriesInfo">DOI 10.17487/RFC7039</span>, <time datetime="2013-10" class="refDate">October 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7039">https://www.rfc-editor.org/info/rfc7039</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+      <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8209">[RFC8209]</dt>
+      <dd>
+<span class="refAuthor">Reynolds, M.</span>, <span class="refAuthor">Turner, S.</span>, and <span class="refAuthor">S. Kent</span>, <span class="refTitle">"A Profile for BGPsec Router Certificates, Certificate Revocation Lists, and Certification Requests"</span>, <span class="seriesInfo">RFC 8209</span>, <span class="seriesInfo">DOI 10.17487/RFC8209</span>, <time datetime="2017-09" class="refDate">September 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8209">https://www.rfc-editor.org/info/rfc8209</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8704">[RFC8704]</dt>
+    <dd>
+<span class="refAuthor">Sriram, K.</span>, <span class="refAuthor">Montgomery, D.</span>, and <span class="refAuthor">J. Haas</span>, <span class="refTitle">"Enhanced Feasible-Path Unicast Reverse Path Forwarding"</span>, <span class="seriesInfo">BCP 84</span>, <span class="seriesInfo">RFC 8704</span>, <span class="seriesInfo">DOI 10.17487/RFC8704</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8704">https://www.rfc-editor.org/info/rfc8704</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+<div id="authors-addresses">
+<section id="appendix-A">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Ke Xu</span></div>
+<div dir="auto" class="left"><span class="org">Tsinghua University</span></div>
+<div dir="auto" class="left"><span class="locality">Beijing</span></div>
+<div dir="auto" class="left"><span class="country-name">China</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:xuke@tsinghua.edu.cn" class="email">xuke@tsinghua.edu.cn</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Jianping Wu</span></div>
+<div dir="auto" class="left"><span class="org">Tsinghua University</span></div>
+<div dir="auto" class="left"><span class="locality">Beijing</span></div>
+<div dir="auto" class="left"><span class="country-name">China</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:jianping@cernet.edu.cn" class="email">jianping@cernet.edu.cn</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Yangfei Guo</span></div>
+<div dir="auto" class="left"><span class="org">Zhongguancun Laboratory</span></div>
+<div dir="auto" class="left"><span class="locality">Beijing</span></div>
+<div dir="auto" class="left"><span class="country-name">China</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:guoyangfei@zgclab.edu.cn" class="email">guoyangfei@zgclab.edu.cn</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Benjamin M. Schwartz</span></div>
+<div dir="auto" class="left"><span class="org">Google LLC</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:bemasc@google.com" class="email">bemasc@google.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Haiyang (Henry) Wang</span></div>
+<div dir="auto" class="left"><span class="org">The University of Minnesota at Duluth</span></div>
+<div dir="auto" class="left">
+<span class="locality">Minnesota</span>,  </div>
+<div dir="auto" class="left"><span class="country-name">United States of America</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:haiyang@d.umn.edu" class="email">haiyang@d.umn.edu</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
