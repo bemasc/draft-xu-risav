@@ -25,8 +25,8 @@ Abstract
    authenticating information to each outgoing packet at its Border
    Routers (ASBRs), and the receiving AS verifies and strips this
    information at its ASBRs.  Packets that fail validation are dropped
-   by the ASBR.  This arrangement provides Source Address Validation
-   among all participating ASes.
+   by the ASBR.  RISAV achieves Source Address Validation among all
+   participating ASes.
 
 Discussion Venues
 
