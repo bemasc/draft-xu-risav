@@ -1157,7 +1157,15 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-overview" class="xref">Overview</a></p>
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>.  <a href="#name-overview" class="xref">Overview</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="xref">2.1</a>.  <a href="#name-what-risav-is" class="xref">What RISAV Is</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="xref">2.2</a>.  <a href="#name-how-risav-works" class="xref">How RISAV Works</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
             <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-control-plane" class="xref">Control Plane</a></p>
@@ -1185,10 +1193,13 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-security-consideration" class="xref">Security Consideration</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
-                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="xref">5.1</a>.  <a href="#name-compatibility" class="xref">Compatibility</a></p>
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="xref">5.1</a>.  <a href="#name-multipath-problem" class="xref">Multipath Problem</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
-                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="xref">5.2</a>.  <a href="#name-key-guessing-and-cracking" class="xref">Key Guessing and Cracking</a></p>
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="xref">5.2</a>.  <a href="#name-compatibility" class="xref">Compatibility</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="xref">5.3</a>.  <a href="#name-key-guessing-and-cracking" class="xref">Key Guessing and Cracking</a></p>
 </li>
             </ul>
 </li>
@@ -1211,7 +1222,7 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
 <p id="section-1-1">Source address spoofing has been identified years ago at <span>[<a href="#RFC2827" class="xref">RFC2827</a>]</span>, and <span>[<a href="#RFC5210" class="xref">RFC5210</a>]</span> has proposed an Source Address Validation Architecture (SAVA) to alleviate such concerns. SAVA classifies this solution into three layers: Access Network, Intra-AS, and Inter-AS. The Inter-AS concerns the SAV at the AS boundaries. It is more challenging for developing the inter-AS source address validation approach because different ASes run different policies in different ISPs independently. It requires the different ASes to collaborate to verify the source address. The inter-AS SAV is more effective than Access or Intra-AS due to its better cost-effectiveness. However, over years of effort, inter-AS source address validation deployment is still not optimistic. An important reason is the difficulty of balancing the clear security benefits of partial implementations with the scalability of large-scale deployments. uRPF <span>[<a href="#RFC5635" class="xref">RFC5635</a>]</span> <span>[<a href="#RFC8704" class="xref">RFC8704</a>]</span>, for example, is a routing-based schemes filter spoofing source address's traffic, which may result in a lack of security benefits due to the dynamic nature of routing or incomplete information caused by partial deployments.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">This document provides a static-static ECDH, RPKI and IPsec-based <span>[<a href="#RFC4301" class="xref">RFC4301</a>]</span> inter-AS approach to source address validation (RISAV). RISAV is a cryptography-based SAV mechanism to reduce the spoofing source address. It combines static-static ECDH (Elliptic Curve Diffie--Hellman key Exchange), RPKI (Resource Public Key Infrastructure), and IPsec (IP Security). RPKI provides the reflection relationship between AS numbers (ASN) and IP prefixes. ECDH negotiates between two ASes with the Security Association (SA) which contains the algorithm, secret key generating material, and IPsec packet type, and so forth. IPsec is designed for secure the Internet at the IP layer. It introduces two protocols, one is AH (authentication header) <span>[<a href="#RFC4302" class="xref">RFC4302</a>]</span> which provides authenticity of the whole packet, including the source address. The other is ESP (IP Encapsulating Security Payload) <span>[<a href="#RFC4303" class="xref">RFC4303</a>]</span> which encrypts the whole packet's payload.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-2">This document provides a static-static ECDH <span>[<a href="#RFC6278" class="xref">RFC6278</a>]</span>, RPKI <span>[<a href="#RFC6480" class="xref">RFC6480</a>]</span> and IPsec-based <span>[<a href="#RFC4301" class="xref">RFC4301</a>]</span> inter-AS approach to source address validation (RISAV). RISAV is a cryptography-based SAV mechanism to reduce the spoofing source address. It combines static-static ECDH (Elliptic Curve Diffie--Hellman key Exchange), RPKI (Resource Public Key Infrastructure), and IPsec (IP Security). RPKI provides the reflection relationship between AS numbers (ASN) and IP prefixes. ECDH negotiates between two ASes with the Security Association (SA) which contains the algorithm, secret key generating material, and IPsec packet type, and so forth. IPsec is designed for secure the Internet at the IP layer. It introduces two protocols, one is AH (authentication header) <span>[<a href="#RFC4302" class="xref">RFC4302</a>]</span> which provides authenticity of the whole packet, including the source address. The other is ESP (IP Encapsulating Security Payload) <span>[<a href="#RFC4303" class="xref">RFC4303</a>]</span> which encrypts the whole packet's payload.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <div id="requirements-language">
 <section id="section-1.1">
         <h3 id="name-requirements-language">
@@ -1230,23 +1241,26 @@ appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">�
       <h2 id="name-overview">
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
       </h2>
-<p id="section-2-1">The goal of this section is to provides the high level description of how RISAV works. RISAV is a cryptography-b  ased inter-AS source address validation method that guarantees security benefits at partial deployment. RISAV uses static-static ECDH
-
-1. RPKI process. The five Reginal Internet Registry (RIR) would be authorized by IANA. They use their root certificate to sign the Certificate Authority (CA) certificate of the Local Internet Registry (LIR). And after that LIR would use a CA certificate to authorize indirectly the Internet Service Provider (ISP) or directly the Autonomous System (AS). When they obtain their own CA certificate, the AS would sign an End Entity (EE) certificate with a Route Origin Authorisation (ROA) which is a cryptographically signed object that states which AS are authorized to originate a certain prefix. Such the reflection of ASN relationship with IP prefixes would be broadcast to the network.<a href="#section-2-1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-2-2">
-<li id="section-2-2.1">Sign ASBR EE certificate. This EE certificate is just like the BGPsec Router Certificate defined in <span>[<a href="#RFC8209" class="xref">RFC8209</a>]</span>. The ASBR would need its own EE certificate for and only for generating and verifying the signature in the AH header directly or indirectly.<a href="#section-2-2.1" class="pilcrow">¶</a>
-</li>
-        <li id="section-2-2.2">IKE process. Before IPsec establishing, the SA must be reached an agreement. There are two ways to negotiate the SA. One is mutual config all the parameters and the other one is using IKE for dynamic negotiating these parameters. Currently used is IKE version 2 (IKEv2, for short using IKE below). Typically, IKE would produce IKE SA in the IKE_SA_INIT exchange and IPsec SA in the IKE_AUTH exchange. This will be done in an ACS.<a href="#section-2-2.2" class="pilcrow">¶</a>
-</li>
-        <li id="section-2-2.3">SA or tag delivery. When all negotiations are done, the IPsec is established. If the ACS is an ASBR actually, it would deliver SA to the other ASBR in this AS. Otherwise, it would deliver the tags generated by the state machine. This delivery will be processed in a secure channel just like using IPsec ESP.<a href="#section-2-2.3" class="pilcrow">¶</a>
-</li>
-        <li id="section-2-2.4">IPsec AH communication. It uses IPsec AH for authentication of the IP source address.  IPsec is often used in tunnel mode as the IPsec VPN. Here, It expands the gateway to the AS border router (ASBR). When two ends x and y in AS X and Y respectively are communicating, the packet from x arriving at its ASBR RA would use the established IPsec channel for adding the representative tag. After the packet arrives at ASBR RB of AS Y, it would be inspected by comparing the consistency of the tag. The tag will be encapsulated in the ICV field in AH.<a href="#section-2-2.4" class="pilcrow">¶</a>
-</li>
-      </ol>
-<p id="section-2-3">A typical workflow of RISAV is shown in <a href="#figure1" class="xref">Figure 1</a>.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-1">The goal of this section is to provides the high level description of what RISAV is and how RISAV works.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<div id="what-risav-is">
+<section id="section-2.1">
+        <h3 id="name-what-risav-is">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-what-risav-is" class="section-name selfRef">What RISAV Is</a>
+        </h3>
+<p id="section-2.1-1">RISAV is a cryptographically-based inter-AS source address validation approach that guarantees security benefits at partial deployment. It aims to provide the IP datagram with a valid source address, with the capability of anti-spoofing, anti-replay, light-weight and efficient, and incremental deployment incentives. As a result, RISAV adds a tag to a packet at the source AS Border Router (ASBR) proving that the packet is with a valid source address, and it would verify and remove this tag at the destination ASBR. The tag will be encapsulated in the Integrity Check Value (ICV) field of IPsec AH/ESP.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="how-risav-works">
+<section id="section-2.2">
+        <h3 id="name-how-risav-works">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-how-risav-works" class="section-name selfRef">How RISAV Works</a>
+        </h3>
+<p id="section-2.2-1">RISAV uses static-static ECDH as an alternative of IKE <span>[<a href="#RFC8247" class="xref">RFC8247</a>]</span> to negotiate the security association (SA) used in IPsec AH/ESP communications. Otherwise, it <span class="bcp14">MUST</span> follow strictly the standard IKE process to negotiate IKE SA and IPsec SA. RPKI obtains the binding relationship between AS numbers and IP prefixes, and it will synchronize the public key generated by ECDH and other messages including the contact IP to all peers. And the original IPsec AH/ESP header format is used in communication to carry this tag. The transport mode of IPsec AH is applied in general.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+<p id="section-2.2-2">Before deploying RISAV, each AS sets a contact IP representative. When negotiating or consulting with one AS, the peer <span class="bcp14">MUST</span> first communicate with this contact IP. This contact IP should contain at least and at most two IPs: one is IPv4 and the other is IPv6. In short, these are referred to as contact IP below.<a href="#section-2.2-2" class="pilcrow">¶</a></p>
+<p id="section-2.2-3">A typical workflow of RISAV is shown in <a href="#figure1" class="xref">Figure 1</a>.<a href="#section-2.2-3" class="pilcrow">¶</a></p>
 <span id="name-risav-workflow-example"></span><div id="figure1">
 <figure id="figure-1">
-        <div class="alignLeft art-text artwork" id="section-2-4.1">
+          <div class="alignLeft art-text artwork" id="section-2.2-4.1">
 <pre>
                             +--------------+
                             |     IANA     |
@@ -1256,32 +1270,49 @@ appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">�
                             +--------------+                  |
                             |      RIR     |                  |
                             +--------------+                  |
-                           /                \-----------------+-1. signed CA
-                          V                  V                |  certificate
+                           /                \-----------------+-1. Signing CA
+                          V                  V                |  Certificate
               +--------------+               +--------------+ |
               |     LIR1     |               |     LIR2     | |
               +--------------+               +--------------+ |
               /                                             \-+
-             V   +------ 2. signed EE certificate -------+   V
+             V   +------ 3. Signing EE Certificate ------+   V
 +--------------+ |                                       | +--------------+
-|              | |    --------------------------------   | |              |
-|              | |          3. IKE negotiation           | |              |
+| 2. ECDH Key  | |                                       | | 2. ECDH Key  |
+|   Exchange   | |    --------------------------------   | |   Exchange   |
+|              | |    4. RPKI and Info Syncrhonization   | |              |
 |     AS A     | |    --------------------------------   | |     AS B     |
-|              | V                                       V |              |
+| contact IP a | V                                       V | contact IP b |
 |           ########  --------------------------------  ########          |
-|           # ASBR #           4. SA Deliver            # ASBR #          |
+|           # ASBR #   5. SA Negotiation and Delivery   # ASBR #          |
 |           ########  --------------------------------  ########          |
 |              |                                           |   Prefix Y   |
 |   Prefix X   |      +++++++++++++++++++++++++++++++++    | Public Key B |
-| Public Key A |           5. data transmission            |              |
-|              |              using IPsec AH               |              |
+| Public Key A |           6. Data Transmission            |              |
+|              |             with IPsec AH/ESP             |              |
 |              |      +++++++++++++++++++++++++++++++++    |              |
 +--------------+                                           +--------------+
 </pre>
 </div>
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
 <a href="#name-risav-workflow-example" class="selfRef">RISAV workflow example.</a>
-        </figcaption></figure>
+          </figcaption></figure>
+</div>
+<ol start="1" type="1" class="normal type-1" id="section-2.2-5">
+<li id="section-2.2-5.1">RPKI process. The five Reginal Internet Registry (RIR) would be authorized by IANA. They use their root certificate to sign the Certificate Authority (CA) certificate of the Local Internet Registry (LIR). And after that LIR would use a CA certificate to authorize indirectly the Internet Service Provider (ISP) or directly the Autonomous System (AS). When they obtain their own CA certificate, the AS would sign an End Entity (EE) certificate with a Route Origin Authorisation (ROA) which is a cryptographically signed object that states which AS are authorized to originate a certain prefix. Such the reflection of the ASN relationship with IP prefixes would be broadcast to the network. This is the prerequisite.<a href="#section-2.2-5.1" class="pilcrow">¶</a>
+</li>
+          <li id="section-2.2-5.2">ECDH key exchange. The two deployed ASes <span class="bcp14">MUST</span> carry out the ECDH procedure to exchange public key and store the secretly private key with each contact IP. Then the AS encapsulates its public key in PKCS#10 syntax <span>[<a href="#RFC2986" class="xref">RFC2986</a>]</span> to request a CA certificate with its contact IP. The contact IP will also be reserved at the relative CA certificate issued to one AS. After this exchange process, the AS pair negotiate immediately the algorithm, the IPsec header type, the session key and other fields at the Security Association Database (SAD).<a href="#section-2.2-5.2" class="pilcrow">¶</a>
+</li>
+          <li id="section-2.2-5.3">ASBR EE certificate signing. The ASBR would need its own EE certificate for and only for generating and verifying the ICV field in the AH/ESP header. This EE certificate is <span class="bcp14">REQUIRED</span> like the BGPsec Router Certificate defined in <span>[<a href="#RFC8209" class="xref">RFC8209</a>]</span>. But the key used in generating the ICV value is not directly using this ECDH key pair. The key will be generated at the step 4 next. Since the ASBR is the main entity that processes the tag in the packet, it <span class="bcp14">MUST</span> be clear that all ASBRs of the same AS at the same time should apply the same key to calculate the ICV value. Thus, this will eliminate the multipath problems, which will be discussed in <a href="#MPProblem" class="xref">Section 5.1</a>.<a href="#section-2.2-5.3" class="pilcrow">¶</a>
+</li>
+          <li id="section-2.2-5.4">RPKI and information synchronization. The ROA synchronization would take place after the RPKI is deployed as step 1 describes. Here it will synchronize the contact IP in the RPKI database. That means the contact IP should be an exposed-available, high-performance IP address. After syncrhonization, the ASBR would get the IP address of the contact IP. The ASBR also requires that the synchronization includes the session key and other things negotiated at the step 2 used in the IPsec communication.<a href="#section-2.2-5.4" class="pilcrow">¶</a>
+</li>
+          <li id="section-2.2-5.5">SA negotiation and delivery. This is an <span class="bcp14">OPTIONAL</span> operation only if the AS doesn't support static-static ECDH. Before IPsec is established, the SA must be reached an agreement. There are two ways to negotiate the SA in traditional IPsec. One is manually config all the parameters and the other one is using IKE for dynamic negotiating these parameters. Currently used is IKE version 2 (IKEv2, for short using IKE below). Typically, IKE would produce IKE SA in the IKE_SA_INIT exchange and IPsec SA in the IKE_AUTH exchange. This will be done at the entity that owns and uses the contact IP, i.e. IKE node should be the node with the contact IP. When all negotiations are done, the IPsec is established.<a href="#section-2.2-5.5" class="pilcrow">¶</a>
+</li>
+          <li id="section-2.2-5.6">IPsec communication. It uses IPsec AH for authentication of the IP source address by default. IPsec is often used in tunnel mode as the IPsec VPN. Here, It expands the gateway to the ASBR. When two ends x and y in AS A and B respectively are communicating, the packet from x arriving at its ASBR RA would use the established IPsec channel for adding the representative tag which is generated with the negotiated and synchronized algorithm, session key, IPsec type, and other items and is filled in the ICV field. After the packet arrives at ASBR RB of AS B, it would be inspected by comparing the consistency of the tag at the packet's ICV field and the tag generated in the same way at the source ASBR.<a href="#section-2.2-5.6" class="pilcrow">¶</a>
+</li>
+        </ol>
+</section>
 </div>
 </section>
 </div>
@@ -1391,20 +1422,27 @@ appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">�
       <h2 id="name-security-consideration">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-security-consideration" class="section-name selfRef">Security Consideration</a>
       </h2>
-<div id="compatibility">
+<div id="MPProblem">
 <section id="section-5.1">
-        <h3 id="name-compatibility">
-<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-compatibility" class="section-name selfRef">Compatibility</a>
+        <h3 id="name-multipath-problem">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-multipath-problem" class="section-name selfRef">Multipath Problem</a>
         </h3>
-<p id="section-5.1-1">When using RISAV, it WOULD be used at last when all other IPsec SA does not match. Such that, RISAV is comparable with the current IPsec Security Architecture. It <span class="bcp14">SHOULD</span> be guaranteed that the preference of RISAV is lower than other IPsec. So it may require the special SPI filled.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="compatibility">
+<section id="section-5.2">
+        <h3 id="name-compatibility">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-compatibility" class="section-name selfRef">Compatibility</a>
+        </h3>
+<p id="section-5.2-1">When using RISAV, it WOULD be used at last when all other IPsec SA does not match. Such that, RISAV is comparable with the current IPsec Security Architecture. It <span class="bcp14">SHOULD</span> be guaranteed that the preference of RISAV is lower than other IPsec. So it may require the special SPI filled.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="key-guessing-and-cracking">
-<section id="section-5.2">
+<section id="section-5.3">
         <h3 id="name-key-guessing-and-cracking">
-<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-key-guessing-and-cracking" class="section-name selfRef">Key Guessing and Cracking</a>
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-key-guessing-and-cracking" class="section-name selfRef">Key Guessing and Cracking</a>
         </h3>
-<p id="section-5.2-1">For resisting label-based reply attacks, the eventual signature used in a packet is generated by the ASBR by hashing a few fields including the IP source address, IP destination address, and the IP prefix length in ROA, SPI, and Sequence Number Field. The attacker could guess the signature and crack that key using brute force. Nevertheless, it depends on the irreversibility of a hash function to prevent back stepping the key from the signature. Furthermore, to decrease such probability, the key used in generating the signature will be updated periodically.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-1">For resisting label-based reply attacks, the eventual signature used in a packet is generated by the ASBR by hashing a few fields including the IP source address, IP destination address, and the IP prefix length in ROA, SPI, and Sequence Number Field. The attacker could guess the signature and crack that key using brute force. Nevertheless, it depends on the irreversibility of a hash function to prevent back stepping the key from the signature. Furthermore, to decrease such probability, the key used in generating the signature will be updated periodically.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1429,6 +1467,10 @@ appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">�
 <dt id="RFC2827">[RFC2827]</dt>
       <dd>
 <span class="refAuthor">Ferguson, P.</span> and <span class="refAuthor">D. Senie</span>, <span class="refTitle">"Network Ingress Filtering: Defeating Denial of Service Attacks which employ IP Source Address Spoofing"</span>, <span class="seriesInfo">BCP 38</span>, <span class="seriesInfo">RFC 2827</span>, <span class="seriesInfo">DOI 10.17487/RFC2827</span>, <time datetime="2000-05" class="refDate">May 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2827">https://www.rfc-editor.org/info/rfc2827</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2986">[RFC2986]</dt>
+      <dd>
+<span class="refAuthor">Nystrom, M.</span> and <span class="refAuthor">B. Kaliski</span>, <span class="refTitle">"PKCS #10: Certification Request Syntax Specification Version 1.7"</span>, <span class="seriesInfo">RFC 2986</span>, <span class="seriesInfo">DOI 10.17487/RFC2986</span>, <time datetime="2000-11" class="refDate">November 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2986">https://www.rfc-editor.org/info/rfc2986</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4301">[RFC4301]</dt>
       <dd>
@@ -1458,6 +1500,10 @@ appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">�
       <dd>
 <span class="refAuthor">Kaufman, C.</span>, <span class="refAuthor">Hoffman, P.</span>, <span class="refAuthor">Nir, Y.</span>, and <span class="refAuthor">P. Eronen</span>, <span class="refTitle">"Internet Key Exchange Protocol Version 2 (IKEv2)"</span>, <span class="seriesInfo">RFC 5996</span>, <span class="seriesInfo">DOI 10.17487/RFC5996</span>, <time datetime="2010-09" class="refDate">September 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5996">https://www.rfc-editor.org/info/rfc5996</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC6278">[RFC6278]</dt>
+      <dd>
+<span class="refAuthor">Herzog, J.</span> and <span class="refAuthor">R. Khazan</span>, <span class="refTitle">"Use of Static-Static Elliptic Curve Diffie-Hellman Key Agreement in Cryptographic Message Syntax"</span>, <span class="seriesInfo">RFC 6278</span>, <span class="seriesInfo">DOI 10.17487/RFC6278</span>, <time datetime="2011-06" class="refDate">June 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6278">https://www.rfc-editor.org/info/rfc6278</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC6480">[RFC6480]</dt>
       <dd>
 <span class="refAuthor">Lepinski, M.</span> and <span class="refAuthor">S. Kent</span>, <span class="refTitle">"An Infrastructure to Support Secure Internet Routing"</span>, <span class="seriesInfo">RFC 6480</span>, <span class="seriesInfo">DOI 10.17487/RFC6480</span>, <time datetime="2012-02" class="refDate">February 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6480">https://www.rfc-editor.org/info/rfc6480</a>&gt;</span>. </dd>
@@ -1473,6 +1519,10 @@ appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">�
 <dt id="RFC8209">[RFC8209]</dt>
       <dd>
 <span class="refAuthor">Reynolds, M.</span>, <span class="refAuthor">Turner, S.</span>, and <span class="refAuthor">S. Kent</span>, <span class="refTitle">"A Profile for BGPsec Router Certificates, Certificate Revocation Lists, and Certification Requests"</span>, <span class="seriesInfo">RFC 8209</span>, <span class="seriesInfo">DOI 10.17487/RFC8209</span>, <time datetime="2017-09" class="refDate">September 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8209">https://www.rfc-editor.org/info/rfc8209</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8247">[RFC8247]</dt>
+      <dd>
+<span class="refAuthor">Nir, Y.</span>, <span class="refAuthor">Kivinen, T.</span>, <span class="refAuthor">Wouters, P.</span>, and <span class="refAuthor">D. Migault</span>, <span class="refTitle">"Algorithm Implementation Requirements and Usage Guidance for the Internet Key Exchange Protocol Version 2 (IKEv2)"</span>, <span class="seriesInfo">RFC 8247</span>, <span class="seriesInfo">DOI 10.17487/RFC8247</span>, <time datetime="2017-09" class="refDate">September 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8247">https://www.rfc-editor.org/info/rfc8247</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8704">[RFC8704]</dt>
     <dd>
