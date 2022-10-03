@@ -404,7 +404,8 @@ Table of Contents
 
       PROBLEM: ESP doesn't protect the source IP, so a packet could be
       replayed by changing the source IP.  Can we negotiate an extension
-      to ESP that covers the IP header?
+      to ESP that covers the IP header?  Or could we always send from
+      the contact IP and encode the ASBR ID in the low bits of the SPI?
 
       OPEN QUESTION: Do we need multiple contact IPs per AS, to support
       fragmented ASes?
@@ -429,10 +430,11 @@ Table of Contents
    only variant of transport mode that only authenticates the IP source
    address, IP destination address, etc.
 
-   This would likely result in a 10-40x decrease in cryptographic cost.
-   However, it would also offer no SAV defense against any attacker who
-   can view legitimate traffic.  An attacker who can read a single
-   authenticated packet could use it to issue an unlimited number of
+   This would likely result in a 10-30x decrease in cryptographic cost
+   compared to standard IPsec.  However, it would also offer no SAV
+   defense against any attacker who can view legitimate traffic.  An
+   attacker who can read a single authenticated packet could simply
+   replace the payload, allowing it to issue an unlimited number of
    spoofed packets.
 
 5.2.  Time-based key rotation
@@ -485,12 +487,11 @@ Table of Contents
 
    RISAV provides significant security benefits even if it is only
    deployed by a fraction of all ASes.  This is particularly clear in
-   the context of reflection-amplification attacks.  If two networks
-   implement RISAV, no one in any other network can trigger a
-   reflection-amplification attack between these two networks.  Thus, if
-   X% of ASes (selected at random) implement RISAV, participating ASes
-   should see an X% reduction in reflection-amplification attack traffic
-   volume.
+   the context of reflection attacks.  If two networks implement RISAV,
+   no one in any other network can trigger a reflection attack between
+   these two networks.  Thus, if X% of ASes (selected at random)
+   implement RISAV, participating ASes should see an X% reduction in
+   reflection attack traffic volume.
 
 6.2.  Threat models for SAV
 
@@ -570,7 +571,18 @@ Table of Contents
 
 8.  IANA Consideration
 
-   TBD.
+   IF APPROVED IANA is requested to add the following entry to the
+   Assigned Internet Protocol Numbers registry:
+
+   *  Decimal: $TBD
+
+   *  Keyword: RISAV-AH
+
+   *  Protocol: AS-to-AS Authentication Header
+
+   *  IPv6 Extension Header: Y
+
+   *  Refrence: (This document)
 
 9.  References
 

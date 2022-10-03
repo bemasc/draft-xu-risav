@@ -1481,7 +1481,7 @@ RISAVAnnouncement ::= SEQUENCE {
 <p id="section-4.2-4">Tunnel mode imposes a space overhead of 73 octets in IPv6.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
 <li class="normal ulEmpty" id="section-4.2-5.1">
-            <p id="section-4.2-5.1.1">PROBLEM: ESP doesn't protect the source IP, so a packet could be replayed by changing the source IP.  Can we negotiate an extension to ESP that covers the IP header?<a href="#section-4.2-5.1.1" class="pilcrow">¶</a></p>
+            <p id="section-4.2-5.1.1">PROBLEM: ESP doesn't protect the source IP, so a packet could be replayed by changing the source IP.  Can we negotiate an extension to ESP that covers the IP header?  Or could we always send from the contact IP and encode the ASBR ID in the low bits of the SPI?<a href="#section-4.2-5.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <ul class="normal ulEmpty">
@@ -1511,7 +1511,7 @@ RISAVAnnouncement ::= SEQUENCE {
         </h3>
 <p id="section-5.1-1">Original IPsec AH needs to authenticate the whole constant part of a packet so that it needs to spend amounts of time finding and processing unchangeable fields in the packet. However, RISAV only needs to find a few changeless fields to authenticate the packet decreasing the cost dramatically.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.1-2">As authenticating the whole packet causes a heavy burden in the computation, we could define an IKE parameter to negotiate a header-only variant of transport mode that only authenticates the IP source address, IP destination address, etc.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.1-3">This would likely result in a 10-40x decrease in cryptographic cost.  However, it would also offer no SAV defense against any attacker who can view legitimate traffic.  An attacker who can read a single authenticated packet could use it to issue an unlimited number of spoofed packets.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-3">This would likely result in a 10-30x decrease in cryptographic cost compared to standard IPsec.  However, it would also offer no SAV defense against any attacker who can view legitimate traffic.  An attacker who can read a single authenticated packet could simply replace the payload, allowing it to issue an unlimited number of spoofed packets.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="time-based-key-rotation">
@@ -1544,7 +1544,7 @@ RISAVAnnouncement ::= SEQUENCE {
         <h3 id="name-incremental-benefit-from-pa">
 <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-incremental-benefit-from-pa" class="section-name selfRef">Incremental benefit from partial deployment</a>
         </h3>
-<p id="section-6.1-1">RISAV provides significant security benefits even if it is only deployed by a fraction of all ASes.  This is particularly clear in the context of reflection-amplification attacks.  If two networks implement RISAV, no one in any other network can trigger a reflection-amplification attack between these two networks.  Thus, if X% of ASes (selected at random) implement RISAV, participating ASes should see an X% reduction in reflection-amplification attack traffic volume.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-1">RISAV provides significant security benefits even if it is only deployed by a fraction of all ASes.  This is particularly clear in the context of reflection attacks.  If two networks implement RISAV, no one in any other network can trigger a reflection attack between these two networks.  Thus, if X% of ASes (selected at random) implement RISAV, participating ASes should see an X% reduction in reflection attack traffic volume.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="threat-models-for-sav">
@@ -1646,7 +1646,19 @@ RISAVAnnouncement ::= SEQUENCE {
       <h2 id="name-iana-consideration">
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-iana-consideration" class="section-name selfRef">IANA Consideration</a>
       </h2>
-<p id="section-8-1">TBD.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-1">IF APPROVED IANA is requested to add the following entry to the Assigned Internet Protocol Numbers registry:<a href="#section-8-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8-2.1">Decimal: $TBD<a href="#section-8-2.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-8-2.2">Keyword: RISAV-AH<a href="#section-8-2.2" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-8-2.3">Protocol: AS-to-AS Authentication Header<a href="#section-8-2.3" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-8-2.4">IPv6 Extension Header: Y<a href="#section-8-2.4" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-8-2.5">Refrence: (This document)<a href="#section-8-2.5" class="pilcrow">¶</a>
+</li>
+      </ul>
 </section>
 </div>
 <section id="section-9">
