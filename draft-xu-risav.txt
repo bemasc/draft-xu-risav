@@ -70,6 +70,7 @@ Table of Contents
 
    1.  Introduction
      1.1.  Requirements Language
+     1.2.  Terminology
    2.  Overview
      2.1.  What RISAV Is
      2.2.  How RISAV Works
@@ -141,6 +142,17 @@ Table of Contents
    "OPTIONAL" in this document are to be interpreted as described in
    BCP14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
+
+1.2.  Terminology
+
+   Commonly used terms in this document are described below.
+
+   ACS:  AS Control Server, which is the logical representative of one
+      AS and is responsible for delivering tags and other information to
+      ASBR.
+
+   contact IP:  This IP is the IP address of ACS which is published with
+      the RISAVAnnouncement.
 
 2.  Overview
 
@@ -303,6 +315,13 @@ Table of Contents
       TODO: Discuss changes to the contact IP, check if there are any
       race conditions between activation and deactivation, IKEv2
       handshakes in progress, SA expiration, etc.
+
+   SA has its own expiration time and IKE has its keepalive mechanism.
+   In abnormal case, i.e. the connection is failed after the IKE
+   handshake is established, SA will be always in effect during its
+   lifetime until it expires or the IKE keepalive is failed.  In normal
+   case, i.e. the connection is actively down, SA will be expired and
+   RISAV will be disabled immediately.
 
       OPEN QUESTION: Does IKEv2 have an authenticated permanent
       rejection option that would help here?
@@ -506,9 +525,17 @@ Table of Contents
 
 6.3.  Multipath Problem
 
-      TODO: this is the problem that requires one AS should be logically
-      presented as one entity.  That means all ASBRs of one AS should be
-      acted like one ASBR.
+   This is the problem that requires one AS should be logically
+   presented as one entity.  That means all ASBRs of one AS should be
+   acted like one ASBR.  Otherwise, different source ASBR would add
+   different IPsec ICV value to the packet.  After forwarding, the
+   packet may not arrive at the ASBR as the source ASBR thought.  The
+   ICV check may be failed.  So the ACS is the entity that represents
+   the AS to negotiate and communicate with peers.  The ACS would
+   deliver the messages including SAs and generate tags to the ASBR so
+   that all ASBRs in the same AS would work like one ASBR for they have
+   the same processing material and process in the same way.  Thus, the
+   multipath problem is solved.
 
 6.4.  Compatibility
 
@@ -566,8 +593,8 @@ Table of Contents
 
 7.4.  NAT scenario
 
-      TODO: I don't think NAT-traversal mode is necesarry inter-AS as
-      all the outter IP header should be the unicast IP address.
+   As all the outter IP header should be the unicast IP address, NAT-
+   traversal mode is not necesarry in inter-AS SAV.
 
 8.  IANA Consideration
 
@@ -602,6 +629,11 @@ Table of Contents
               Request Syntax Specification Version 1.7", RFC 2986,
               DOI 10.17487/RFC2986, November 2000,
               <https://www.rfc-editor.org/info/rfc2986>.
+
+   [RFC3948]  Huttunen, A., Swander, B., Volpe, V., DiBurro, L., and M.
+              Stenberg, "UDP Encapsulation of IPsec ESP Packets",
+              RFC 3948, DOI 10.17487/RFC3948, January 2005,
+              <https://www.rfc-editor.org/info/rfc3948>.
 
    [RFC4301]  Kent, S. and K. Seo, "Security Architecture for the
               Internet Protocol", RFC 4301, DOI 10.17487/RFC4301,

@@ -1154,13 +1154,16 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
                 <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-requirements-language" class="internal xref">Requirements Language</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
+                <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2" class="auto internal xref">1.2</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
             <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-overview" class="internal xref">Overview</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
-                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-what-risav-is" class="internal xref">What RISAV Is</a></p>
+                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-what-risav-is" class="internal xref">What RISAV Is</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
                 <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="auto internal xref">2.2</a>.  <a href="#name-how-risav-works" class="internal xref">How RISAV Works</a></p>
@@ -1279,6 +1282,26 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
 described in BCP14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
 appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="terminology">
+<section id="section-1.2">
+        <h3 id="name-terminology">
+<a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+        </h3>
+<p id="section-1.2-1">Commonly used terms in this document are described below.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-1.2-2">
+          <dt id="section-1.2-2.1">ACS:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.2">
+            <p id="section-1.2-2.2.1">AS Control Server, which is the logical representative of one AS and is responsible for delivering tags and other information to ASBR.<a href="#section-1.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.3">contact IP:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.4">
+            <p id="section-1.2-2.4.1">This IP is the IP address of ACS which is published with the RISAVAnnouncement.<a href="#section-1.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
 </section>
 </div>
 </section>
@@ -1414,9 +1437,10 @@ RISAVAnnouncement ::= SEQUENCE {
             <p id="section-3.1-4.1.1">TODO: Discuss changes to the contact IP, check if there are any race conditions between activation and deactivation, IKEv2 handshakes in progress, SA expiration, etc.<a href="#section-3.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
+<p id="section-3.1-5">SA has its own expiration time and IKE has its keepalive mechanism. In abnormal case, i.e. the connection is failed after the IKE handshake is established, SA will be always in effect during its lifetime until it expires or the IKE keepalive is failed. In normal case, i.e. the connection is actively down, SA will be expired and RISAV will be disabled immediately.<a href="#section-3.1-5" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-3.1-5.1">
-            <p id="section-3.1-5.1.1">OPEN QUESTION: Does IKEv2 have an authenticated permanent rejection option that would help here?<a href="#section-3.1-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal ulEmpty" id="section-3.1-6.1">
+            <p id="section-3.1-6.1.1">OPEN QUESTION: Does IKEv2 have an authenticated permanent rejection option that would help here?<a href="#section-3.1-6.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -1560,11 +1584,7 @@ RISAVAnnouncement ::= SEQUENCE {
         <h3 id="name-multipath-problem">
 <a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-multipath-problem" class="section-name selfRef">Multipath Problem</a>
         </h3>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-6.3-1.1">
-            <p id="section-6.3-1.1.1">TODO: this is the problem that requires one AS should be logically presented as one entity. That means all ASBRs of one AS should be acted like one ASBR.<a href="#section-6.3-1.1.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
+<p id="section-6.3-1">This is the problem that requires one AS should be logically presented as one entity. That means all ASBRs of one AS should be acted like one ASBR. Otherwise, different source ASBR would add different IPsec ICV value to the packet. After forwarding, the packet may not arrive at the ASBR as the source ASBR thought. The ICV check may be failed. So the ACS is the entity that represents the AS to negotiate and communicate with peers. The ACS would deliver the messages including SAs and generate tags to the ASBR so that all ASBRs in the same AS would work like one ASBR for they have the same processing material and process in the same way. Thus, the multipath problem is solved.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="compatibility">
@@ -1632,11 +1652,7 @@ RISAVAnnouncement ::= SEQUENCE {
         <h3 id="name-nat-scenario">
 <a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-nat-scenario" class="section-name selfRef">NAT scenario</a>
         </h3>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-7.4-1.1">
-            <p id="section-7.4-1.1.1">TODO: I don't think NAT-traversal mode is necesarry inter-AS as all the outter IP header should be the unicast IP address.<a href="#section-7.4-1.1.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
+<p id="section-7.4-1">As all the outter IP header should be the unicast IP address, NAT-traversal mode is not necesarry in inter-AS SAV.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1681,6 +1697,10 @@ RISAVAnnouncement ::= SEQUENCE {
 <dt id="RFC2986">[RFC2986]</dt>
         <dd>
 <span class="refAuthor">Nystrom, M.</span> and <span class="refAuthor">B. Kaliski</span>, <span class="refTitle">"PKCS #10: Certification Request Syntax Specification Version 1.7"</span>, <span class="seriesInfo">RFC 2986</span>, <span class="seriesInfo">DOI 10.17487/RFC2986</span>, <time datetime="2000-11" class="refDate">November 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2986">https://www.rfc-editor.org/info/rfc2986</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC3948">[RFC3948]</dt>
+        <dd>
+<span class="refAuthor">Huttunen, A.</span>, <span class="refAuthor">Swander, B.</span>, <span class="refAuthor">Volpe, V.</span>, <span class="refAuthor">DiBurro, L.</span>, and <span class="refAuthor">M. Stenberg</span>, <span class="refTitle">"UDP Encapsulation of IPsec ESP Packets"</span>, <span class="seriesInfo">RFC 3948</span>, <span class="seriesInfo">DOI 10.17487/RFC3948</span>, <time datetime="2005-01" class="refDate">January 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc3948">https://www.rfc-editor.org/info/rfc3948</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4301">[RFC4301]</dt>
         <dd>
