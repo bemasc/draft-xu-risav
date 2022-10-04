@@ -70,35 +70,35 @@ Table of Contents
 
    1.  Introduction
      1.1.  Requirements Language
-   2.  Terminology
-   3.  Overview
-     3.1.  What RISAV Is
-     3.2.  How RISAV Works
-   4.  Control Plane
-     4.1.  Disabling RISAV
-   5.  Data Plane
-     5.1.  Transport Mode
-     5.2.  Tunnel Mode
-   6.  Possible Extensions
-     6.1.  Header-only authentication
-     6.2.  Time-based key rotation
-     6.3.  Static Negotiation
-   7.  Security Consideration
-     7.1.  Incremental benefit from partial deployment
-     7.2.  Threat models for SAV
-     7.3.  Multipath Problem
-     7.4.  Compatibility
-       7.4.1.  With end-to-end IPsec
-       7.4.2.  With other SAV mechanisms
-   8.  Operational Considerations
-     8.1.  Reliability
-     8.2.  Performance
-     8.3.  MTU
-     8.4.  NAT scenario
-   9.  IANA Consideration
-   10. References
-     10.1.  Normative References
-     10.2.  Informative References
+     1.2.  Terminology
+   2.  Overview
+     2.1.  What RISAV Is
+     2.2.  How RISAV Works
+   3.  Control Plane
+     3.1.  Disabling RISAV
+   4.  Data Plane
+     4.1.  Transport Mode
+     4.2.  Tunnel Mode
+   5.  Possible Extensions
+     5.1.  Header-only authentication
+     5.2.  Time-based key rotation
+     5.3.  Static Negotiation
+   6.  Security Consideration
+     6.1.  Incremental benefit from partial deployment
+     6.2.  Threat models for SAV
+     6.3.  Multipath Problem
+     6.4.  Compatibility
+       6.4.1.  With end-to-end IPsec
+       6.4.2.  With other SAV mechanisms
+   7.  Operational Considerations
+     7.1.  Reliability
+     7.2.  Performance
+     7.3.  MTU
+     7.4.  NAT scenario
+   8.  IANA Consideration
+   9.  References
+     9.1.  Normative References
+     9.2.  Informative References
    Authors' Addresses
 
 1.  Introduction
@@ -143,27 +143,23 @@ Table of Contents
    BCP14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-2.  Terminology
+1.2.  Terminology
 
    Commonly used terms in this document are described below.
 
-   ACS:  AS Contact Server, which is the logical representative of one
-      AS and is responsible for delivering session keys and other
-      information to ASBR.
+   ACS:  AS Control Server, which is the logical representative of one
+      AS and is responsible for delivering tags and other information to
+      ASBR.
 
-   Contact IP:  The IP address of the ACS.
+   contact IP:  This IP is the IP address of ACS which is published with
+      the RISAVAnnouncement.
 
-   ASBR:  AS border router, which is at the boundary of an AS.
-
-   SAV:  Source Address Validation, which verifies the source address of
-      an IP packet and guarantee the source address is valid.
-
-3.  Overview
+2.  Overview
 
    The goal of this section is to provides the high level description of
    what RISAV is and how RISAV works.
 
-3.1.  What RISAV Is
+2.1.  What RISAV Is
 
    RISAV is a cryptographically-based inter-AS source address validation
    approach that guarantees security benefits at partial deployment.  It
@@ -175,7 +171,7 @@ Table of Contents
    this tag at the destination ASBR.  The tag will be encapsulated in
    the Integrity Check Value (ICV) field of IPsec AH/ESP.
 
-3.2.  How RISAV Works
+2.2.  How RISAV Works
 
    RISAV uses IKEv2 to negotiate an IPsec security association (SA)
    between any two ASes.  RPKI provides the binding relationship between
@@ -263,7 +259,7 @@ Table of Contents
        the packet's ICV field and the tag generated in the same way at
        the source ASBR.
 
-4.  Control Plane
+3.  Control Plane
 
    The functions of the control plane of RISAV include:
 
@@ -298,7 +294,7 @@ Table of Contents
       fails?  To be truly secure, all traffic from that AS would have to
       be dropped...
 
-4.1.  Disabling RISAV
+3.1.  Disabling RISAV
 
    To disable RISAV, a participating AS MUST perform the following steps
    in order:
@@ -320,10 +316,17 @@ Table of Contents
       race conditions between activation and deactivation, IKEv2
       handshakes in progress, SA expiration, etc.
 
+   SA has its own expiration time and IKE has its keepalive mechanism.
+   In abnormal case, i.e. the connection is failed after the IKE
+   handshake is established, SA will be always in effect during its
+   lifetime until it expires or the IKE keepalive is failed.  In normal
+   case, i.e. the connection is actively down, SA will be expired and
+   RISAV will be disabled immediately.
+
       OPEN QUESTION: Does IKEv2 have an authenticated permanent
       rejection option that would help here?
 
-5.  Data Plane
+4.  Data Plane
 
    All the ASBRs of the AS are REQUIRED to enable RISAV.  It uses SPI
    for destination ASBR to locate the SA uniquely when processing the AH
@@ -361,7 +364,7 @@ Table of Contents
    contact IPs of other ASes.  ASBRs MAY drop inbound packets to the
    contact IP from non-participating ASes.
 
-5.1.  Transport Mode
+4.1.  Transport Mode
 
    To avoid conflict with other uses of IPsec, RISAV defines its own
    variant of the IPsec Authentication Header (AH).  The RISAV-AH header
@@ -395,7 +398,7 @@ Table of Contents
    In transport mode, each AS's SA Database (SAD) is indexed by SPI and
    counterpart AS, regardless of the source and destination IPs.
 
-5.2.  Tunnel Mode
+4.2.  Tunnel Mode
 
    In tunnel mode, a RISAV sender ASBR wraps each outgoing packet in an
    ESP payload.  Each ASBR uses its own source address, and sets the
@@ -426,14 +429,14 @@ Table of Contents
       OPEN QUESTION: Do we need multiple contact IPs per AS, to support
       fragmented ASes?
 
-6.  Possible Extensions
+5.  Possible Extensions
 
    This section presents potential additions to the design.
 
       TODO: Remove this section once we have consensus on whether these
       extensions are worthwhile.
 
-6.1.  Header-only authentication
+5.1.  Header-only authentication
 
    Original IPsec AH needs to authenticate the whole constant part of a
    packet so that it needs to spend amounts of time finding and
@@ -453,7 +456,7 @@ Table of Contents
    replace the payload, allowing it to issue an unlimited number of
    spoofed packets.
 
-6.2.  Time-based key rotation
+5.2.  Time-based key rotation
 
    It has two ways for an ACS to generate tags.  One is using a state
    machine.  The state machine runs and triggers the state transition
@@ -481,7 +484,7 @@ Table of Contents
    from ACS to ASBR in a secure channel which MAY be, for example, ESP
    [RFC4303].
 
-6.3.  Static Negotiation
+5.3.  Static Negotiation
 
    The use of IKEv2 between ASes might be fragile, and creates a number
    of potential race conditions (e.g. if the RPKI database contents
@@ -497,9 +500,9 @@ Table of Contents
    IPsec negotiation system, so it seems best to try a design using
    IKEv2 first.
 
-7.  Security Consideration
+6.  Security Consideration
 
-7.1.  Incremental benefit from partial deployment
+6.1.  Incremental benefit from partial deployment
 
    RISAV provides significant security benefits even if it is only
    deployed by a fraction of all ASes.  This is particularly clear in
@@ -509,7 +512,7 @@ Table of Contents
    implement RISAV, participating ASes should see an X% reduction in
    reflection attack traffic volume.
 
-7.2.  Threat models for SAV
+6.2.  Threat models for SAV
 
    Different RISAV modes potentially offer different security
    properties.  For example, in Transport Mode, off-path attackers
@@ -520,15 +523,23 @@ Table of Contents
    are willing to pay the extra data-plane costs, should prefer tunnel
    mode.
 
-7.3.  Multipath Problem
+6.3.  Multipath Problem
 
-      TODO: this is the problem that requires one AS should be logically
-      presented as one entity.  That means all ASBRs of one AS should be
-      acted like one ASBR.
+   This is the problem that requires one AS should be logically
+   presented as one entity.  That means all ASBRs of one AS should be
+   acted like one ASBR.  Otherwise, different source ASBR would add
+   different IPsec ICV value to the packet.  After forwarding, the
+   packet may not arrive at the ASBR as the source ASBR thought.  The
+   ICV check may be failed.  So the ACS is the entity that represents
+   the AS to negotiate and communicate with peers.  The ACS would
+   deliver the messages including SAs and generate tags to the ASBR so
+   that all ASBRs in the same AS would work like one ASBR for they have
+   the same processing material and process in the same way.  Thus, the
+   multipath problem is solved.
 
-7.4.  Compatibility
+6.4.  Compatibility
 
-7.4.1.  With end-to-end IPsec
+6.4.1.  With end-to-end IPsec
 
    When RISAV is used in transport mode, there is a risk of confusion
    between the RISAV AH header and end-to-end AH headers used by
@@ -540,16 +551,16 @@ Table of Contents
    specialized RISAV-AH header.  (In tunnel mode, no such confusion is
    possible.)
 
-7.4.2.  With other SAV mechanisms
+6.4.2.  With other SAV mechanisms
 
    RISAV can OPTIONAL cooperate with intra-domain SAV and access-layer
    SAV, such as [RFC8704] or SAVI [RFC7039].  Only when intra-domain or
    access-layer SAV, if deployed, check passed can the packet process
    and forward correctly.
 
-8.  Operational Considerations
+7.  Operational Considerations
 
-8.1.  Reliability
+7.1.  Reliability
 
    The ACS, represented by a contact IP, must be a high-availability,
    high-performance service to avoid outages.  When it chooses to use a
@@ -559,7 +570,7 @@ Table of Contents
    to the IKE negotiation.  An ASBR MUST be a BGP speaker before it is
    elected as the distinguished ASBR.
 
-8.2.  Performance
+7.2.  Performance
 
    RISAV requires participating ASes to perform symmetric cryptography
    on every RISAV-protected packet that they originate or terminate.
@@ -575,17 +586,17 @@ Table of Contents
    of 2021 an IPsec throughput of 1 Terabit per second was achievable
    using optimized software on a single server [INTEL].
 
-8.3.  MTU
+7.3.  MTU
 
       TODO: Figure out what to say about MTU, PMTUD, etc.  Perhaps an
       MTU probe is required after setup?  Or on an ongoing basis?
 
-8.4.  NAT scenario
+7.4.  NAT scenario
 
-      TODO: I don't think NAT-traversal mode is necesarry inter-AS as
-      all the outter IP header should be the unicast IP address.
+   As all the outter IP header should be the unicast IP address, NAT-
+   traversal mode is not necesarry in inter-AS SAV.
 
-9.  IANA Consideration
+8.  IANA Consideration
 
    IF APPROVED IANA is requested to add the following entry to the
    Assigned Internet Protocol Numbers registry:
@@ -600,9 +611,9 @@ Table of Contents
 
    *  Refrence: (This document)
 
-10.  References
+9.  References
 
-10.1.  Normative References
+9.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -618,6 +629,11 @@ Table of Contents
               Request Syntax Specification Version 1.7", RFC 2986,
               DOI 10.17487/RFC2986, November 2000,
               <https://www.rfc-editor.org/info/rfc2986>.
+
+   [RFC3948]  Huttunen, A., Swander, B., Volpe, V., DiBurro, L., and M.
+              Stenberg, "UDP Encapsulation of IPsec ESP Packets",
+              RFC 3948, DOI 10.17487/RFC3948, January 2005,
+              <https://www.rfc-editor.org/info/rfc3948>.
 
    [RFC4301]  Kent, S. and K. Seo, "Security Architecture for the
               Internet Protocol", RFC 4301, DOI 10.17487/RFC4301,
@@ -692,7 +708,7 @@ Table of Contents
               (RPKI)", RFC 6488, DOI 10.17487/RFC6488, February 2012,
               <https://www.rfc-editor.org/info/rfc6488>.
 
-10.2.  Informative References
+9.2.  Informative References
 
    [INTEL]    "Achieving 1 Tbps IPsec with AVX-512", April 2021,
               <https://networkbuilders.intel.com/solutionslibrary/3rd-
