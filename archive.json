@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-10-02T01:52:39.623400+00:00",
+  "timestamp": "2022-10-04T01:46:06.230219+00:00",
   "repo": "bemasc/draft-xu-risav",
   "labels": [
     {
@@ -201,6 +201,32 @@
           ]
         }
       ]
+    },
+    {
+      "number": 4,
+      "id": "PR_kwDOIGC7185AFfak",
+      "title": "Reorganize draft contents",
+      "url": "https://github.com/bemasc/draft-xu-risav/pull/4",
+      "state": "OPEN",
+      "author": "bemasc",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Major changes:\r\n* Move time-based rotation and static-static ECDH into \"possible extensions\"\r\n* Define an optional tunnel mode\r\n* Define the RPKI object format\r\n* Expand security and operational considerations\r\n* Various other text relocations for organizational purposes",
+      "createdAt": "2022-10-03T20:40:30Z",
+      "updatedAt": "2022-10-03T23:55:49Z",
+      "baseRepository": "bemasc/draft-xu-risav",
+      "baseRefName": "main",
+      "baseRefOid": "ca5afa535baf4efb78da46a160be012a918041a6",
+      "headRepository": "bemasc/draft-xu-risav",
+      "headRefName": "bemasc-reorg",
+      "headRefOid": "76ee8b7bcf68d33fd845ce89d733b80e0d6d046e",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
