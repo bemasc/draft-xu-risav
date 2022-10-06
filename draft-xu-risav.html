@@ -1207,10 +1207,18 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-security-consideration" class="internal xref">Security Consideration</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
-                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-incremental-benefit-from-pa" class="internal xref">Incremental benefit from partial deployment</a></p>
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-threat-models" class="internal xref">Threat models</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.1">
+                    <p id="section-toc.1-1.6.2.1.2.1.1"><a href="#section-6.1.1" class="auto internal xref">6.1.1</a>.  <a href="#name-replay-attacks" class="internal xref">Replay attacks</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.2">
+                    <p id="section-toc.1-1.6.2.1.2.2.1"><a href="#section-6.1.2" class="auto internal xref">6.1.2</a>.  <a href="#name-downgrade-attacks" class="internal xref">Downgrade attacks</a></p>
+</li>
+                </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
-                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-threat-models-for-sav" class="internal xref">Threat models for SAV</a></p>
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-incremental-benefit-from-pa" class="internal xref">Incremental benefit from partial deployment</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
                 <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-multipath-problem" class="internal xref">Multipath Problem</a></p>
@@ -1414,17 +1422,14 @@ appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">�
 RISAVAnnouncement ::= SEQUENCE {
          version [0] INTEGER DEFAULT 0,
          asID ASID,
-         contactIP ipAddress }
+         contactIP ipAddress,
+         testing Boolean }
 </pre><a href="#section-3-4" class="pilcrow">¶</a>
 </div>
 <p id="section-3-5">When a participating AS discovers another participating AS (via its regular sync of the RPKI database), it initiates an IKEv2 handshake between its own contact IP and the other AS's contact IP.  This handshake <span class="bcp14">MUST</span> include an IKE_AUTH exchange that authenticates both ASes with their RPKI ROA certificates.<a href="#section-3-5" class="pilcrow">¶</a></p>
 <p id="section-3-6">Once this handshake is complete, each AS <span class="bcp14">MUST</span> activate RISAV on all outgoing packets, and <span class="bcp14">SHOULD</span> drop all non-RISAV traffic from the other AS after a reasonable grace period (e.g. 60 seconds).<a href="#section-3-6" class="pilcrow">¶</a></p>
-<p id="section-3-7">For more information about RPKI, one can refer to <span>[<a href="#RFC6480" class="cite xref">RFC6480</a>]</span>.<a href="#section-3-7" class="pilcrow">¶</a></p>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-3-8.1">
-          <p id="section-3-8.1.1">OPEN QUESTION: What should we say about cases where the handshake fails?  To be truly secure, all traffic from that AS would have to be dropped...<a href="#section-3-8.1.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
+<p id="section-3-7">The "testing" field indicates whether this contact IP is potentially unreliable.  When this field is set to <code>true</code>, other ASes <span class="bcp14">MUST</span> fall back to ordinary operation if IKE negotiation fails.  Otherwise, the contact IP is presumed to be fully reliable, and other ASes <span class="bcp14">SHOULD</span> drop all non-RISAV traffic from this AS if IKE negotiation fails (see {downgrade}).<a href="#section-3-7" class="pilcrow">¶</a></p>
+<p id="section-3-8">For more information about RPKI, one can refer to <span>[<a href="#RFC6480" class="cite xref">RFC6480</a>]</span>.<a href="#section-3-8" class="pilcrow">¶</a></p>
 <div id="disabling-risav">
 <section id="section-3.1">
         <h3 id="name-disabling-risav">
@@ -1573,20 +1578,37 @@ RISAVAnnouncement ::= SEQUENCE {
       <h2 id="name-security-consideration">
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-consideration" class="section-name selfRef">Security Consideration</a>
       </h2>
-<div id="incremental-benefit-from-partial-deployment">
+<div id="threat-models">
 <section id="section-6.1">
-        <h3 id="name-incremental-benefit-from-pa">
-<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-incremental-benefit-from-pa" class="section-name selfRef">Incremental benefit from partial deployment</a>
+        <h3 id="name-threat-models">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-threat-models" class="section-name selfRef">Threat models</a>
         </h3>
-<p id="section-6.1-1">RISAV provides significant security benefits even if it is only deployed by a fraction of all ASes.  This is particularly clear in the context of reflection attacks.  If two networks implement RISAV, no one in any other network can trigger a reflection attack between these two networks.  Thus, if X% of ASes (selected at random) implement RISAV, participating ASes should see an X% reduction in reflection attack traffic volume.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-1">In general, RISAV seeks to provide a strong defense against arbitrary active attackers who are external to the source and destination AS.  However, different RISAV modes and configurations offer different security properties.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<div id="replay-attacks">
+<section id="section-6.1.1">
+          <h4 id="name-replay-attacks">
+<a href="#section-6.1.1" class="section-number selfRef">6.1.1. </a><a href="#name-replay-attacks" class="section-name selfRef">Replay attacks</a>
+          </h4>
+<p id="section-6.1.1-1">In Transport Mode, off-path attackers cannot spoof the source IPs of a participating AS, but any attacker with access to valid traffic can replay it (from anywhere), potentially enabling DoS attacks by replaying expensive traffic (e.g. TCP SYNs, QUIC Initials).  ASes that wish to have replay defense, and are willing to pay the extra data-plane costs, should prefer tunnel mode.<a href="#section-6.1.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="threat-models-for-sav">
+<div id="downgrade">
+<section id="section-6.1.2">
+          <h4 id="name-downgrade-attacks">
+<a href="#section-6.1.2" class="section-number selfRef">6.1.2. </a><a href="#name-downgrade-attacks" class="section-name selfRef">Downgrade attacks</a>
+          </h4>
+<p id="section-6.1.2-1">An on-path attacker between two participating ASes could attempt to defeat RISAV by blocking IKEv2 handshakes to the Contact IP of a target AS.  If the AS initiating the handshake falls back to non-RISAV behavior after a handshake failure, this enables the attacker to remove all RISAV protection.<a href="#section-6.1.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.1.2-2">This vulnerable behavior is required when the "testing" flag is set, but is otherwise discouraged.<a href="#section-6.1.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="incremental-benefit-from-partial-deployment">
 <section id="section-6.2">
-        <h3 id="name-threat-models-for-sav">
-<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-threat-models-for-sav" class="section-name selfRef">Threat models for SAV</a>
+        <h3 id="name-incremental-benefit-from-pa">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-incremental-benefit-from-pa" class="section-name selfRef">Incremental benefit from partial deployment</a>
         </h3>
-<p id="section-6.2-1">Different RISAV modes potentially offer different security properties.  For example, in Transport Mode, off-path attackers cannot spoof the source IPs of a participating AS, but any attacker with access to valid traffic can replay it (from anywhere), potentially enabling DoS attacks by replaying expensive traffic (e.g. TCP SYNs, QUIC Initials).  ASes that wish to have replay defense, and are willing to pay the extra data-plane costs, should prefer tunnel mode.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-1">RISAV provides significant security benefits even if it is only deployed by a fraction of all ASes.  This is particularly clear in the context of reflection attacks.  If two networks implement RISAV, no one in any other network can trigger a reflection attack between these two networks.  Thus, if X% of ASes (selected at random) implement RISAV, participating ASes should see an X% reduction in reflection attack traffic volume.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="MPProblem">
