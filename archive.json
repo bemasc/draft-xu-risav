@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-10-04T01:46:06.230219+00:00",
+  "timestamp": "2022-10-06T01:36:06.628367+00:00",
   "repo": "bemasc/draft-xu-risav",
   "labels": [
     {
@@ -49,7 +49,141 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 5,
+      "id": "I_kwDOIGC7185TNPOf",
+      "title": "What should we say about cases where the handshake fails?",
+      "url": "https://github.com/bemasc/draft-xu-risav/issues/5",
+      "state": "OPEN",
+      "author": "BasilGuo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "**DESC**: This question is about IKE failure in Section Control Plane.\r\n**OPEN QUESTION**: What should we say about cases where the handshake fails?  To be truly secure, all traffic from that AS would have to be dropped...",
+      "createdAt": "2022-10-04T09:55:37Z",
+      "updatedAt": "2022-10-04T15:10:16Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "There may be a number of reasons that cause the handshake or the link fails. When one handshake fails, the ACS would know nothing SAs about the peer AS; vice versa. Arrived packets that should be processed with RISAV would be failed to locate available SAs. Then this packet should be processed like a common packet that not be protected with an IPsec AH/ESP header. So do the source and destination ASBR. When the handshake is complete and running after a while one ACS's link failed, the peer ACS would detect the link is failed with the keepalive packets and remove or deprecate the relative SAs. The keepalive packet is defined in {{RFC3948}} while it is not in NAT traversal. After a grace period, the traffic will be recovered. But the failure should be reported to the administrator with the operations protocols. This would decrease the effect on inter-AS traffic.",
+          "createdAt": "2022-10-04T13:50:48Z",
+          "updatedAt": "2022-10-04T13:50:48Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "My concern is principally related to downgrade attacks on RISAV.\r\n\r\nConsider an MITM attacker between the two ASes.  If this attacker simply drops all packets to the contact IPs, the attacker can prevent the two ASes from ever performing an IKE handshake.  In HTTPS, this would be similar to blocking port 443.  HTTPS simply \"fails hard\" in this case, to ensure that the attacker can only produce a DoS.  We could do the same, but I suspect AS operators would be concerned about the possibility of accidental outages, especially when the RISAV deployment is new.  However, if the ASes simply fall back to non-RISAV communication, then the attacker can disable RISAV.\r\n\r\nI think our best option is probably to add a boolean flag like `testing` to `RISAVAnnouncement`.  If this flag is true, it means that the operator does not guarantee the uptime of this ACS, so other ASes should fall back to non-RISAV.  Then each AS can decide whether its own RISAV implementation is stable enough to remove the fallback.\r\n\r\nI agree that failures should be reported to the administrator, even in testing mode, so that AS operators can tell whether RISAV is working correctly.",
+          "createdAt": "2022-10-04T13:56:24Z",
+          "updatedAt": "2022-10-04T13:56:24Z"
+        },
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "MitM could be prevented by the PKI and hierarchical CA in current practice. As we have RPKI now, shall we assume that the PKI and hierarchical CA is also deployed? If so, the MitM would be prevented.\r\nUnfortunately, this could not relieve the attack path as a line topo. If the stub AS has only one path to the transit AS and deploys RISAV, the attack drops all the traffic to the contact IP making the RISAV never be enabled.",
+          "createdAt": "2022-10-04T14:59:11Z",
+          "updatedAt": "2022-10-04T14:59:11Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "> MitM could be prevented by the PKI and hierarchical CA in current practice.\r\n\r\nYes, I agree.\r\n\r\n> the attack drops all the traffic to the contact IP making the RISAV never be enabled.\r\n\r\nRight, and if this is allowed it mostly defeats the protections provided by the PKI and CA.  I think we should try to fix this vulnerability, while also making it easy for operators to experiment with RISAV without risking accidental outages",
+          "createdAt": "2022-10-04T15:10:15Z",
+          "updatedAt": "2022-10-04T15:10:15Z"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "id": "I_kwDOIGC7185TNPd3",
+      "title": "Does IKEv2 have an authenticated permanent rejection option that would help here?",
+      "url": "https://github.com/bemasc/draft-xu-risav/issues/6",
+      "state": "OPEN",
+      "author": "BasilGuo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "**DESC**: This is about how to disable RISAV normally and orderly.\r\n**TODO**: Discuss changes to the contact IP, check if there are any race conditions between\r\nactivation and deactivation, IKEv2 handshakes in progress, SA expiration, etc.\r\n**OPEN QUESTION**: Does IKEv2 have an authenticated permanent rejection option that would help here?",
+      "createdAt": "2022-10-04T09:56:19Z",
+      "updatedAt": "2022-10-04T10:11:25Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOIGC7185TNPmO",
+      "title": "How do peers express a preference or requirement for transport or tunnel mode?",
+      "url": "https://github.com/bemasc/draft-xu-risav/issues/7",
+      "state": "OPEN",
+      "author": "BasilGuo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "**DESC**: This is proposed in Section Data Plane.\r\n**OPEN QUESTION**: How do peers express a preference or requirement for transport or tunnel mode?",
+      "createdAt": "2022-10-04T09:56:42Z",
+      "updatedAt": "2022-10-04T13:58:09Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "I believe IKE is quite flexible and probably offers this capability (via USE_TRANSPORT_MODE), but I'm not quite sure how it works.  We need some advice from an IKE expert.",
+          "createdAt": "2022-10-04T13:58:08Z",
+          "updatedAt": "2022-10-04T13:58:08Z"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "id": "I_kwDOIGC7185TNPt2",
+      "title": "Do we need multiple contact IPs per AS, to support fragmented ASes?",
+      "url": "https://github.com/bemasc/draft-xu-risav/issues/8",
+      "state": "OPEN",
+      "author": "BasilGuo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "**DESC**: This is proposed together with #9 in Section Data Plane.\r\n**OPEN QUESTION**: Do we need multiple contact IPs per AS, to support fragmented ASes?",
+      "createdAt": "2022-10-04T09:57:01Z",
+      "updatedAt": "2022-10-04T10:14:47Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 9,
+      "id": "I_kwDOIGC7185TNQMC",
+      "title": "PROBLEM: Can we negotiate an extension to ESP that covers the IP header?  Or could we always send from the contact IP and encode the ASBR ID in the low bits of the SPI?",
+      "url": "https://github.com/bemasc/draft-xu-risav/issues/9",
+      "state": "OPEN",
+      "author": "BasilGuo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "**DESC**: This is proposed together with #8 in Section Data Plane.\r\n**PROBLEM**: ESP doesn't protect the source IP, so a packet could be replayed by changing the source IP.  Can we negotiate an extension to ESP that covers the IP header?  Or could we always send from the contact IP and encode the ASBR ID in the low bits of the SPI?",
+      "createdAt": "2022-10-04T09:58:27Z",
+      "updatedAt": "2022-10-04T10:16:10Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 11,
+      "id": "I_kwDOIGC7185TOm2N",
+      "title": "Clarify relationship between contact IP and ACS",
+      "url": "https://github.com/bemasc/draft-xu-risav/issues/11",
+      "state": "CLOSED",
+      "author": "bemasc",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The text currently discusses both an \"AS Control Server\" and a \"contact IP\", which is the IP address of the ACS.  We should adjust the terminology to make this relationship clearer and avoid having multiple terms for the same thing.",
+      "createdAt": "2022-10-04T14:03:44Z",
+      "updatedAt": "2022-10-04T15:13:35Z",
+      "closedAt": "2022-10-04T15:13:35Z",
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
@@ -207,26 +341,324 @@
       "id": "PR_kwDOIGC7185AFfak",
       "title": "Reorganize draft contents",
       "url": "https://github.com/bemasc/draft-xu-risav/pull/4",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bemasc",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Major changes:\r\n* Move time-based rotation and static-static ECDH into \"possible extensions\"\r\n* Define an optional tunnel mode\r\n* Define the RPKI object format\r\n* Expand security and operational considerations\r\n* Various other text relocations for organizational purposes",
       "createdAt": "2022-10-03T20:40:30Z",
-      "updatedAt": "2022-10-03T23:55:49Z",
+      "updatedAt": "2022-10-04T07:05:10Z",
       "baseRepository": "bemasc/draft-xu-risav",
       "baseRefName": "main",
       "baseRefOid": "ca5afa535baf4efb78da46a160be012a918041a6",
       "headRepository": "bemasc/draft-xu-risav",
       "headRefName": "bemasc-reorg",
       "headRefOid": "76ee8b7bcf68d33fd845ce89d733b80e0d6d046e",
+      "closedAt": "2022-10-04T07:05:10Z",
+      "mergedAt": "2022-10-04T07:05:10Z",
+      "mergedBy": "BasilGuo",
+      "mergeCommit": {
+        "oid": "bc1d21fa9a78320d61db0f8d9c4b9620dd0dab04"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIGC7185DUSTe",
+          "commit": {
+            "abbreviatedOid": "76ee8b7"
+          },
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "I may wonder shall we still use an ACS together with the contact IP, as the contact IP is actually the ACS's  IP in the initial design. Their functions are overlapped. So I recommend we should explain what are contact IP and ACS respectively.",
+          "createdAt": "2022-10-04T07:03:40Z",
+          "updatedAt": "2022-10-04T07:03:40Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "id": "PR_kwDOIGC7185AHuXI",
+      "title": "update: Open Question & TODO",
+      "url": "https://github.com/bemasc/draft-xu-risav/pull/10",
+      "state": "MERGED",
+      "author": "BasilGuo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "1. section Terminology\r\n2. OQ: IKE handshake fails\r\n3. TODO: changes when disabling RISAV\r\n4. TODO: NAT scenario.",
+      "createdAt": "2022-10-04T10:02:09Z",
+      "updatedAt": "2022-10-04T15:04:05Z",
+      "baseRepository": "bemasc/draft-xu-risav",
+      "baseRefName": "main",
+      "baseRefOid": "bc1d21fa9a78320d61db0f8d9c4b9620dd0dab04",
+      "headRepository": "bemasc/draft-xu-risav",
+      "headRefName": "BasilGuo-todo-problem",
+      "headRefOid": "43e3cb1353ecfbf4a728290a63c808c4e9889dcc",
+      "closedAt": "2022-10-04T15:04:04Z",
+      "mergedAt": "2022-10-04T15:04:04Z",
+      "mergedBy": "BasilGuo",
+      "mergeCommit": {
+        "oid": "ad2046cf7d7069bf3a9914e0c7fbbbc3e6bfa2b1"
+      },
+      "comments": [
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@bemasc @Netinplug @wangnetsg \r\nI have created some issues #5  #6 #7 #8 #9 with these open questions.\r\nWe could close them with PR when we have a consensus.",
+          "createdAt": "2022-10-04T10:07:19Z",
+          "updatedAt": "2022-10-04T13:18:48Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIGC7185DWZVM",
+          "commit": {
+            "abbreviatedOid": "4beea1f"
+          },
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-10-04T13:35:16Z",
+          "updatedAt": "2022-10-04T13:40:58Z",
+          "comments": [
+            {
+              "originalPosition": 34,
+              "body": "I think it would be better to move this to #5 so we can discuss the possibilities.  Then if we agree on a solution we can remove the \"open question\" here.\r\n\r\nMy main concern here is that an attacker could prevent the IKE handshake from ever succeeding, and it might be hard to tell the difference between an attack and an accident.",
+              "createdAt": "2022-10-04T13:35:16Z",
+              "updatedAt": "2022-10-04T13:40:58Z"
+            },
+            {
+              "originalPosition": 42,
+              "body": "The IKE keepalive mechanism seems to be only for NAT traversal mode with UDP encapsulation, so I'm not sure that it applies here.\r\n\r\nMy real concern is about more complicated edge cases, such as when a network disables RISAV in the middle of a handshake, or when one network activates RISAV for the first time at the same time that another network is deactivating it.  If the networks disagree about whether RISAV is supposed to work, this could result in an outage (especially if we are \"strict\" to prevent any attacker from disabling RISAV).\r\n\r\nRather than trying to solve this here, I think we should open an issue or wait for input from the working group.",
+              "createdAt": "2022-10-04T13:40:03Z",
+              "updatedAt": "2022-10-04T13:40:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOIGC7185DXAL-",
+          "commit": {
+            "abbreviatedOid": "4beea1f"
+          },
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-10-04T14:43:52Z",
+          "updatedAt": "2022-10-04T14:43:52Z",
+          "comments": [
+            {
+              "originalPosition": 34,
+              "body": "Thanks for moving this text to #5.  Please also remove it here.",
+              "createdAt": "2022-10-04T14:43:52Z",
+              "updatedAt": "2022-10-04T14:43:52Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOIGC7185DXENk",
+          "commit": {
+            "abbreviatedOid": "4beea1f"
+          },
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-10-04T14:53:05Z",
+          "updatedAt": "2022-10-04T14:53:05Z",
+          "comments": [
+            {
+              "originalPosition": 34,
+              "body": "I have removed that yet. See  https://github.com/bemasc/draft-xu-risav/pull/10/commits/43e3cb1353ecfbf4a728290a63c808c4e9889dcc.",
+              "createdAt": "2022-10-04T14:53:05Z",
+              "updatedAt": "2022-10-04T14:55:31Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOIGC7185DXEoO",
+          "commit": {
+            "abbreviatedOid": "4beea1f"
+          },
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-10-04T14:54:00Z",
+          "updatedAt": "2022-10-04T14:54:01Z",
+          "comments": [
+            {
+              "originalPosition": 34,
+              "body": "Thanks",
+              "createdAt": "2022-10-04T14:54:01Z",
+              "updatedAt": "2022-10-04T14:54:01Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "id": "PR_kwDOIGC7185AJEUc",
+      "title": "Rename \"control server\" to \"contact server\"",
+      "url": "https://github.com/bemasc/draft-xu-risav/pull/12",
+      "state": "MERGED",
+      "author": "bemasc",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #11",
+      "createdAt": "2022-10-04T14:38:13Z",
+      "updatedAt": "2022-10-04T15:23:04Z",
+      "baseRepository": "bemasc/draft-xu-risav",
+      "baseRefName": "main",
+      "baseRefOid": "ad2046cf7d7069bf3a9914e0c7fbbbc3e6bfa2b1",
+      "headRepository": "bemasc/draft-xu-risav",
+      "headRefName": "bemasc-acs",
+      "headRefOid": "dbed24b5d1954ba98d4832a7614e7abd9f4cb1ac",
+      "closedAt": "2022-10-04T15:13:34Z",
+      "mergedAt": "2022-10-04T15:13:34Z",
+      "mergedBy": "BasilGuo",
+      "mergeCommit": {
+        "oid": "062dd54931c725f008e25d7b942eddac13b52b3a"
+      },
+      "comments": [
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "It looks like this was merged before the conflict could be corrected.",
+          "createdAt": "2022-10-04T15:17:44Z",
+          "updatedAt": "2022-10-04T15:17:44Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "I've reverted this (#13) and committed the change directly to `main` to avoid further conflicts.",
+          "createdAt": "2022-10-04T15:21:15Z",
+          "updatedAt": "2022-10-04T15:21:15Z"
+        },
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Thanks : )\r\n\r\n",
+          "createdAt": "2022-10-04T15:23:03Z",
+          "updatedAt": "2022-10-04T15:23:03Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIGC7185DXNIN",
+          "commit": {
+            "abbreviatedOid": "dbed24b"
+          },
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "There are some conflicts with PR #10, I have removed the description in #10 and reserved #12.",
+          "createdAt": "2022-10-04T15:13:09Z",
+          "updatedAt": "2022-10-04T15:13:09Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDOIGC7185AJRMN",
+      "title": "Revert \"Rename \"control server\" to \"contact server\"\"",
+      "url": "https://github.com/bemasc/draft-xu-risav/pull/13",
+      "state": "MERGED",
+      "author": "bemasc",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-10-04T15:18:04Z",
+      "updatedAt": "2022-10-04T15:18:23Z",
+      "baseRepository": "bemasc/draft-xu-risav",
+      "baseRefName": "main",
+      "baseRefOid": "062dd54931c725f008e25d7b942eddac13b52b3a",
+      "headRepository": "bemasc/draft-xu-risav",
+      "headRefName": "revert-12-bemasc-acs",
+      "headRefOid": "a0a4b57df8f020297abf6b3bf3a81fa13da6e8ee",
+      "closedAt": "2022-10-04T15:18:15Z",
+      "mergedAt": "2022-10-04T15:18:15Z",
+      "mergedBy": "bemasc",
+      "mergeCommit": {
+        "oid": "e9538db80fcb735282f0d527a589b6a1a2128d99"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 14,
+      "id": "PR_kwDOIGC7185ALLDK",
+      "title": "Add a \"testing\" flag and discuss downgrade resistance",
+      "url": "https://github.com/bemasc/draft-xu-risav/pull/14",
+      "state": "OPEN",
+      "author": "bemasc",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #5",
+      "createdAt": "2022-10-05T00:56:08Z",
+      "updatedAt": "2022-10-05T22:02:45Z",
+      "baseRepository": "bemasc/draft-xu-risav",
+      "baseRefName": "main",
+      "baseRefOid": "aae7e07fce9e86c3f64393ab1bd901ba40926136",
+      "headRepository": "bemasc/draft-xu-risav",
+      "headRefName": "bemasc-testing",
+      "headRefOid": "6b916cd2ca97feac5278529a24f7d00bffea6e92",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOIGC7185Db1_a",
+          "commit": {
+            "abbreviatedOid": "6b916cd"
+          },
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-10-05T12:49:39Z",
+          "updatedAt": "2022-10-05T12:49:39Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "As I have known, the RFC 4301-4303 say both IPsec AH and ESP have a sequence number field while the AH maybe not check this field and the ESP must check this field. It's up to the IPsec receiver. Shall we require that the ASBR implemented RISAV must check this sequence number field no matter whether it is AH or ESP?",
+              "createdAt": "2022-10-05T12:49:39Z",
+              "updatedAt": "2022-10-05T12:49:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOIGC7185DenGL",
+          "commit": {
+            "abbreviatedOid": "6b916cd"
+          },
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-10-05T22:02:45Z",
+          "updatedAt": "2022-10-05T22:02:45Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "The problem is that we are in \"multi-sender\" mode, sharing a single SA across many ASBRs.  Per [RFC 4302 Section 3.4.3](https://datatracker.ietf.org/doc/html/rfc4302#section-3.4.3), this makes the sequence number field unusable:\r\n\r\n>    However, this standard specifies no mechanisms for providing anti-\r\n>    replay for a multi-sender SA (unicast or multicast).  In the absence\r\n>    of negotiation (or manual configuration) of an anti-replay mechanism\r\n>    for such an SA, it is recommended that sender and receiver checking\r\n>    of the Sequence Number for the SA be disabled\r\n\r\nThis is because the different senders will have different sequence numbers, but the receiver has no way to distinguish the different senders.  This is why I've removed the sequence number entirely from the RISAV-AH header.\r\n\r\nIn Tunnel Mode, the different ASBRs are instructed to use distinct source IPs for RISAV.  This allows the receiver to maintain separate sequence number tracking for each sender, so sequence numbers work correctly and can be used for anti-replay.",
+              "createdAt": "2022-10-05T22:02:45Z",
+              "updatedAt": "2022-10-05T22:02:45Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
