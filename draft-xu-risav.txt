@@ -5,13 +5,13 @@
 Network Working Group                                              K. Xu
 Internet-Draft                                                     J. Wu
 Intended status: Informational                       Tsinghua University
-Expires: 3 April 2023                                             Y. Guo
+Expires: 14 April 2023                                            Y. Guo
                                                  Zhongguancun Laboratory
                                                           B. M. Schwartz
                                                               Google LLC
                                                         H. (Henry). Wang
                                    The University of Minnesota at Duluth
-                                                       30 September 2022
+                                                         11 October 2022
 
 
 An RPKI and IPsec-based AS-to-AS Approach for Source Address Validation
@@ -50,7 +50,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 April 2023.
+   This Internet-Draft will expire on 14 April 2023.
 
 Copyright Notice
 
@@ -300,7 +300,7 @@ Table of Contents
    back to ordinary operation if IKE negotiation fails.  Otherwise, the
    contact IP is presumed to be fully reliable, and other ASes SHOULD
    drop all non-RISAV traffic from this AS if IKE negotiation fails (see
-   {downgrade}).
+   Section 6.1.2).
 
    For more information about RPKI, one can refer to [RFC6480].
 
@@ -651,16 +651,6 @@ Table of Contents
               Address Spoofing", BCP 38, RFC 2827, DOI 10.17487/RFC2827,
               May 2000, <https://www.rfc-editor.org/info/rfc2827>.
 
-   [RFC2986]  Nystrom, M. and B. Kaliski, "PKCS #10: Certification
-              Request Syntax Specification Version 1.7", RFC 2986,
-              DOI 10.17487/RFC2986, November 2000,
-              <https://www.rfc-editor.org/info/rfc2986>.
-
-   [RFC3948]  Huttunen, A., Swander, B., Volpe, V., DiBurro, L., and M.
-              Stenberg, "UDP Encapsulation of IPsec ESP Packets",
-              RFC 3948, DOI 10.17487/RFC3948, January 2005,
-              <https://www.rfc-editor.org/info/rfc3948>.
-
    [RFC4301]  Kent, S. and K. Seo, "Security Architecture for the
               Internet Protocol", RFC 4301, DOI 10.17487/RFC4301,
               December 2005, <https://www.rfc-editor.org/info/rfc4301>.
@@ -689,11 +679,6 @@ Table of Contents
               Specification", RFC 5905, DOI 10.17487/RFC5905, June 2010,
               <https://www.rfc-editor.org/info/rfc5905>.
 
-   [RFC5996]  Kaufman, C., Hoffman, P., Nir, Y., and P. Eronen,
-              "Internet Key Exchange Protocol Version 2 (IKEv2)",
-              RFC 5996, DOI 10.17487/RFC5996, September 2010,
-              <https://www.rfc-editor.org/info/rfc5996>.
-
    [RFC6278]  Herzog, J. and R. Khazan, "Use of Static-Static Elliptic
               Curve Diffie-Hellman Key Agreement in Cryptographic
               Message Syntax", RFC 6278, DOI 10.17487/RFC6278, June
@@ -717,12 +702,6 @@ Table of Contents
               and Certification Requests", RFC 8209,
               DOI 10.17487/RFC8209, September 2017,
               <https://www.rfc-editor.org/info/rfc8209>.
-
-   [RFC8247]  Nir, Y., Kivinen, T., Wouters, P., and D. Migault,
-              "Algorithm Implementation Requirements and Usage Guidance
-              for the Internet Key Exchange Protocol Version 2 (IKEv2)",
-              RFC 8247, DOI 10.17487/RFC8247, September 2017,
-              <https://www.rfc-editor.org/info/rfc8247>.
 
    [RFC8704]  Sriram, K., Montgomery, D., and J. Haas, "Enhanced
               Feasible-Path Unicast Reverse Path Forwarding", BCP 84,
