@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-10-13T01:46:35.726301+00:00",
+  "timestamp": "2022-10-16T01:57:22.815502+00:00",
   "repo": "bemasc/draft-xu-risav",
   "labels": [
     {
@@ -155,7 +155,7 @@
       "labels": [],
       "body": "**DESC**: This is proposed together with #9 in Section Data Plane.\r\n**OPEN QUESTION**: Do we need multiple contact IPs per AS, to support fragmented ASes?",
       "createdAt": "2022-10-04T09:57:01Z",
-      "updatedAt": "2022-10-12T21:16:26Z",
+      "updatedAt": "2022-10-13T13:27:06Z",
       "closedAt": null,
       "comments": [
         {
@@ -171,6 +171,20 @@
           "body": "> Single contact IP would suffer from Single Point Failure\r\n\r\nI don't know that this is true.  I think the ACS can probably be implemented as a loosely-coupled anycast service.\r\n\r\nThe reason I think we might need multiple contact IPs is for ASes that have fragmented routing.  If a single AS is composed of several \"islands\" that have no route to each other, then each island would need its own contact IP.  However, I'm not familiar enough with BGP to understand if this is really allowed, or how common it is.",
           "createdAt": "2022-10-12T21:16:25Z",
           "updatedAt": "2022-10-12T21:16:25Z"
+        },
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "As far as I know, this scenario (isolated routing area in one AS) is very rare. I recommend we could ignore this case at this time.",
+          "createdAt": "2022-10-13T07:26:22Z",
+          "updatedAt": "2022-10-13T07:26:22Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "OK, let's ignore that problem.  We can still support multiple contact IPs (i.e. multiple ACSes) within the current framework, so long as it is sufficient for a remote AS to contact any one of them.",
+          "createdAt": "2022-10-13T13:27:06Z",
+          "updatedAt": "2022-10-13T13:27:06Z"
         }
       ]
     },
@@ -726,24 +740,26 @@
       "id": "PR_kwDOIGC7185Ar0Bn",
       "title": "Editorial adjustments",
       "url": "https://github.com/bemasc/draft-xu-risav/pull/16",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bemasc",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "This change adjusts the presentation and explanation of the content to make it easier to read and understand. Some text has been made shorter for simplicity, and additional explanation has been added where necessary.",
       "createdAt": "2022-10-12T21:10:29Z",
-      "updatedAt": "2022-10-12T21:10:29Z",
+      "updatedAt": "2022-10-14T23:47:36Z",
       "baseRepository": "bemasc/draft-xu-risav",
       "baseRefName": "main",
       "baseRefOid": "8c01734a31eebf434de24c45bdaab1a2b549a036",
       "headRepository": "bemasc/draft-xu-risav",
       "headRefName": "bemasc-cleanup",
       "headRefOid": "3ace9a19a1ddea5e8254320ce2998c5eba40315a",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2022-10-14T23:47:36Z",
+      "mergedAt": "2022-10-14T23:47:36Z",
+      "mergedBy": "BasilGuo",
+      "mergeCommit": {
+        "oid": "cf76e016117c15429794ad676d3d02e39e7cedbe"
+      },
       "comments": [],
       "reviews": []
     }
