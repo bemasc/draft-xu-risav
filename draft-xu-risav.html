@@ -13,11 +13,11 @@
 <meta content="
        This document presents RISAV, a protocol for establishing and using IPsec security between Autonomous Systems (ASes) using the RPKI identity system. In this protocol, the originating AS adds authenticating information to each outgoing packet at its Border Routers (ASBRs), and the receiving AS verifies and strips this information at its ASBRs. Packets that fail validation are dropped by the ASBR. RISAV achieves Source Address Validation among all participating ASes. 
     " name="description">
-<meta content="xml2rfc 3.15.0" name="generator">
+<meta content="xml2rfc 3.15.1" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-xu-risav-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.15.0
+  xml2rfc 3.15.1
     Python 3.10.5
     appdirs 1.4.4
     ConfigArgParse 1.5.3
@@ -1528,11 +1528,6 @@ RISAVAnnouncement ::= SEQUENCE {
 <ul class="normal ulEmpty">
 <li class="normal ulEmpty" id="section-4.2-5.1">
             <p id="section-4.2-5.1.1">PROBLEM: ESP doesn't protect the source IP, so a packet could be replayed by changing the source IP.  Can we negotiate an extension to ESP that covers the IP header?  Or could we always send from the contact IP and encode the ASBR ID in the low bits of the SPI?<a href="#section-4.2-5.1.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-4.2-6.1">
-            <p id="section-4.2-6.1.1">OPEN QUESTION: Do we need multiple contact IPs per AS, to support fragmented ASes?<a href="#section-4.2-6.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>

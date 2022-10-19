@@ -434,9 +434,6 @@ Table of Contents
       to ESP that covers the IP header?  Or could we always send from
       the contact IP and encode the ASBR ID in the low bits of the SPI?
 
-      OPEN QUESTION: Do we need multiple contact IPs per AS, to support
-      fragmented ASes?
-
 5.  Possible Extensions
 
    This section presents potential additions to the design.
