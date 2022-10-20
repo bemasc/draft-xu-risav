@@ -2,16 +2,16 @@
 
 
 
-Network Working Group                                              K. Xu
+ipsecme                                                            K. Xu
 Internet-Draft                                                     J. Wu
-Intended status: Informational                       Tsinghua University
-Expires: 14 April 2023                                            Y. Guo
+Intended status: Standards Track                     Tsinghua University
+Expires: 23 April 2023                                            Y. Guo
                                                  Zhongguancun Laboratory
                                                           B. M. Schwartz
                                                               Google LLC
                                                         H. (Henry). Wang
                                    The University of Minnesota at Duluth
-                                                         11 October 2022
+                                                         20 October 2022
 
 
 An RPKI and IPsec-based AS-to-AS Approach for Source Address Validation
@@ -50,7 +50,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 April 2023.
+   This Internet-Draft will expire on 23 April 2023.
 
 Copyright Notice
 
