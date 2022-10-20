@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-10-16T01:57:22.815502+00:00",
+  "timestamp": "2022-10-20T01:48:11.913800+00:00",
   "repo": "bemasc/draft-xu-risav",
   "labels": [
     {
@@ -148,15 +148,17 @@
       "id": "I_kwDOIGC7185TNPt2",
       "title": "Do we need multiple contact IPs per AS, to support fragmented ASes?",
       "url": "https://github.com/bemasc/draft-xu-risav/issues/8",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "BasilGuo",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "bemasc"
+      ],
       "labels": [],
       "body": "**DESC**: This is proposed together with #9 in Section Data Plane.\r\n**OPEN QUESTION**: Do we need multiple contact IPs per AS, to support fragmented ASes?",
       "createdAt": "2022-10-04T09:57:01Z",
-      "updatedAt": "2022-10-13T13:27:06Z",
-      "closedAt": null,
+      "updatedAt": "2022-10-19T02:17:57Z",
+      "closedAt": "2022-10-19T02:17:57Z",
       "comments": [
         {
           "author": "BasilGuo",
@@ -226,6 +228,22 @@
       "createdAt": "2022-10-04T14:03:44Z",
       "updatedAt": "2022-10-04T15:13:35Z",
       "closedAt": "2022-10-04T15:13:35Z",
+      "comments": []
+    },
+    {
+      "number": 20,
+      "id": "I_kwDOIGC7185UYxOX",
+      "title": "Version 02 Release Request",
+      "url": "https://github.com/bemasc/draft-xu-risav/issues/20",
+      "state": "OPEN",
+      "author": "BasilGuo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "As there are no differences in this draft I think, shall we release the latest version and submit it to [datatracker](https://datatracker.ietf.org/submit/)?\r\nI uploaded the draft manually before, but I don't know whether there is a more convenient way to submit this draft.",
+      "createdAt": "2022-10-20T01:28:09Z",
+      "updatedAt": "2022-10-20T01:29:56Z",
+      "closedAt": null,
       "comments": []
     }
   ],
@@ -759,6 +777,112 @@
       "mergedBy": "BasilGuo",
       "mergeCommit": {
         "oid": "cf76e016117c15429794ad676d3d02e39e7cedbe"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 17,
+      "id": "PR_kwDOIGC7185BCuqg",
+      "title": "Remove question about multiple contact IPs",
+      "url": "https://github.com/bemasc/draft-xu-risav/pull/17",
+      "state": "MERGED",
+      "author": "bemasc",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "We have consensus that this is not necessary at this time.\r\n\r\nFixes #8",
+      "createdAt": "2022-10-18T19:17:45Z",
+      "updatedAt": "2022-10-19T02:17:56Z",
+      "baseRepository": "bemasc/draft-xu-risav",
+      "baseRefName": "main",
+      "baseRefOid": "cf76e016117c15429794ad676d3d02e39e7cedbe",
+      "headRepository": "bemasc/draft-xu-risav",
+      "headRefName": "bemasc-fix-8",
+      "headRefOid": "2342099c759e92f69d2d1e890a75ec874c06e34f",
+      "closedAt": "2022-10-19T02:17:56Z",
+      "mergedAt": "2022-10-19T02:17:56Z",
+      "mergedBy": "BasilGuo",
+      "mergeCommit": {
+        "oid": "37010fe5d5d49a2c37f2c64b439c01939f9f2400"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 18,
+      "id": "PR_kwDOIGC7185BETt5",
+      "title": "remove: the Time-based key rotation session.",
+      "url": "https://github.com/bemasc/draft-xu-risav/pull/18",
+      "state": "MERGED",
+      "author": "BasilGuo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "As we have all agreed with keeping RISAV simple, the time-based key is not needed.",
+      "createdAt": "2022-10-19T02:55:34Z",
+      "updatedAt": "2022-10-20T01:19:20Z",
+      "baseRepository": "bemasc/draft-xu-risav",
+      "baseRefName": "main",
+      "baseRefOid": "37010fe5d5d49a2c37f2c64b439c01939f9f2400",
+      "headRepository": "bemasc/draft-xu-risav",
+      "headRefName": "BasilGuo-rm-timekey",
+      "headRefOid": "e8de607e643ff390af8deb4311eed6cc59321c9a",
+      "closedAt": "2022-10-20T01:19:20Z",
+      "mergedAt": "2022-10-20T01:19:20Z",
+      "mergedBy": "BasilGuo",
+      "mergeCommit": {
+        "oid": "f252f05746ae7081fee1093bb8ed66f6ec6cbd0c"
+      },
+      "comments": [
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Oh, sorry, I may misunderstand. It's my fault. I'd like to remain this section so I'll revert it next.",
+          "createdAt": "2022-10-20T01:19:12Z",
+          "updatedAt": "2022-10-20T01:19:12Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIGC7185EZk2J",
+          "commit": {
+            "abbreviatedOid": "e8de607"
+          },
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "I have no objection to removing this section.\r\n\r\nTo be clear: I don't think it's necessary to remove this section.  This is an interesting idea, and this section only notes it as a \"possible extension\", so I don't think it really adds complexity to the specification.  However, if you would rather remove this section to keep this document shorter, that also seems fine to me.",
+          "createdAt": "2022-10-19T13:22:28Z",
+          "updatedAt": "2022-10-19T13:22:28Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "id": "PR_kwDOIGC7185BJoQG",
+      "title": "Revert \"remove: the Time-based key rotation session.\"",
+      "url": "https://github.com/bemasc/draft-xu-risav/pull/19",
+      "state": "MERGED",
+      "author": "BasilGuo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Reverts bemasc/draft-xu-risav#18",
+      "createdAt": "2022-10-20T01:20:07Z",
+      "updatedAt": "2022-10-20T01:21:29Z",
+      "baseRepository": "bemasc/draft-xu-risav",
+      "baseRefName": "main",
+      "baseRefOid": "f252f05746ae7081fee1093bb8ed66f6ec6cbd0c",
+      "headRepository": "bemasc/draft-xu-risav",
+      "headRefName": "revert-18-BasilGuo-rm-timekey",
+      "headRefOid": "e92833a7d570b2c02f1b6df2b4d22d032cfa4ac3",
+      "closedAt": "2022-10-20T01:21:29Z",
+      "mergedAt": "2022-10-20T01:21:29Z",
+      "mergedBy": "BasilGuo",
+      "mergeCommit": {
+        "oid": "7de73d3796d0f3536383308c92ebc5dca8323353"
       },
       "comments": [],
       "reviews": []
