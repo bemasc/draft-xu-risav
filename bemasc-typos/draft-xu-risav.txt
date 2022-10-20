@@ -238,7 +238,7 @@ Table of Contents
        authorized by IANA, use their root certificate to sign the
        Certificate Authority (CA) certificate of the Local Internet
        Registry (LIR), which is used to authorize the Autonomous System
-       (AS)(sometimes indirectly via the Internet Service Provider
+       (AS) (sometimes indirectly via the Internet Service Provider
        (ISP)).  When they obtain their own CA certificate, the AS would
        sign an End Entity (EE) certificate with a Route Origin
        Authorisation (ROA) which is a cryptographically signed object
