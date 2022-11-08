@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-10-23T01:45:26.968912+00:00",
+  "timestamp": "2022-11-08T01:21:55.505799+00:00",
   "repo": "bemasc/draft-xu-risav",
   "labels": [
     {
@@ -109,7 +109,7 @@
       ],
       "body": "**DESC**: This is about how to disable RISAV normally and orderly.\r\n**TODO**: Discuss changes to the contact IP, check if there are any race conditions between\r\nactivation and deactivation, IKEv2 handshakes in progress, SA expiration, etc.\r\n**OPEN QUESTION**: Does IKEv2 have an authenticated permanent rejection option that would help here?",
       "createdAt": "2022-10-04T09:56:19Z",
-      "updatedAt": "2022-10-20T15:38:45Z",
+      "updatedAt": "2022-11-07T14:04:43Z",
       "closedAt": null,
       "comments": [
         {
@@ -118,6 +118,13 @@
           "body": "SA has its own expiration time. So the SA would expire automatically. I think it should have a keepalive mechanism for the IKE parties to keep in touch. If the already existing keepalive mechanism is not suitable for RISAV (the existing one is for NAT traversal), it should implement keepalive itself. However, a timeout interval may be also enough.\r\n\r\nThe IKEv2 has such an authenticated permanent rejection option that would help the IKE nodes to reject connections quickly. But, when an IKE node is down or unfortunately crashed, i.e. in an abnormal case, how it can send out such an option? And in a normal case, RISAV maybe not care about the disabling time. It may care more about the key-rollover time in my way.",
           "createdAt": "2022-10-06T11:51:36Z",
           "updatedAt": "2022-10-06T11:51:36Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "It looks like IKE authentication without creating a \"Child SA\" is possible using the CHILDLESS_IKEV2_SUPPORTED notification (RFC 6023).  However, RFC 6023 is EXPERIMENTAL, so this may not be widely implemented.\r\n\r\nIf both peers support this option, the server could reject a CREATE_CHILD_SA request using an error code.  Perhaps we could say that a TS_UNACCEPTABLE or NO_PROPOSAL_CHOSEN error means that the IKEv2 client should not try again after 24 hours.",
+          "createdAt": "2022-11-07T14:04:43Z",
+          "updatedAt": "2022-11-07T14:04:43Z"
         }
       ]
     },
