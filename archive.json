@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-11-08T01:21:55.505799+00:00",
+  "timestamp": "2022-11-10T01:23:35.044705+00:00",
   "repo": "bemasc/draft-xu-risav",
   "labels": [
     {
@@ -109,7 +109,7 @@
       ],
       "body": "**DESC**: This is about how to disable RISAV normally and orderly.\r\n**TODO**: Discuss changes to the contact IP, check if there are any race conditions between\r\nactivation and deactivation, IKEv2 handshakes in progress, SA expiration, etc.\r\n**OPEN QUESTION**: Does IKEv2 have an authenticated permanent rejection option that would help here?",
       "createdAt": "2022-10-04T09:56:19Z",
-      "updatedAt": "2022-11-07T14:04:43Z",
+      "updatedAt": "2022-11-09T16:42:17Z",
       "closedAt": null,
       "comments": [
         {
@@ -122,9 +122,23 @@
         {
           "author": "bemasc",
           "authorAssociation": "OWNER",
-          "body": "It looks like IKE authentication without creating a \"Child SA\" is possible using the CHILDLESS_IKEV2_SUPPORTED notification (RFC 6023).  However, RFC 6023 is EXPERIMENTAL, so this may not be widely implemented.\r\n\r\nIf both peers support this option, the server could reject a CREATE_CHILD_SA request using an error code.  Perhaps we could say that a TS_UNACCEPTABLE or NO_PROPOSAL_CHOSEN error means that the IKEv2 client should not try again after 24 hours.",
+          "body": "It looks like IKE authentication without creating a \"Child SA\" is possible using the CHILDLESS_IKEV2_SUPPORTED notification (RFC 6023).  However, RFC 6023 is EXPERIMENTAL, so this may not be widely implemented.\r\n\r\nIf both peers support this option, the server could reject a CREATE_CHILD_SA request using an error code.  Perhaps we could say that a TS_UNACCEPTABLE or NO_PROPOSAL_CHOSEN error means that the IKEv2 client should try again after 24 hours.",
           "createdAt": "2022-11-07T14:04:43Z",
-          "updatedAt": "2022-11-07T14:04:43Z"
+          "updatedAt": "2022-11-08T09:26:19Z"
+        },
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "That sounds great. We do require such options. NO_PROPOSAL_CHOSEN may be more clear as it says in Section 3.10.1 of RFC 7296. The following referred sections are all defined in RFC7296 (https://www.rfc-editor.org/rfc/rfc7296), and not repeated.\r\n\r\nBut I think we should distinguish normal case and abnormal case. In normal case, SA could be deleted with INFORMATIONAL Exchanges as defined in Section 1.4.1. While in abnormal case, i.e. one IKE party (an ACS in RISAV) is down, that couldn't be so much easy. This may not be accepted when disabling RISAV without removing its configurations, as it says in Section 2.4 that IPsec IKEv2 will retry multiple/undetermined times on one SA. So it may not be automatic to disable RISAV.",
+          "createdAt": "2022-11-08T02:37:34Z",
+          "updatedAt": "2022-11-08T02:37:34Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "Some other possibilities mentioned during the IPSECME discussion:\r\n* Using DELETE to immediately delete the initial child SA.\r\n* NO_ADDITIONAL_SAS (means \"no more child SAs on this IKE SA\")\r\n* Somehow deliberately failing the IKE_AUTH step (e.g., signing an invalid keyshare response) to prevent the creation of the initial child SA.",
+          "createdAt": "2022-11-09T16:42:17Z",
+          "updatedAt": "2022-11-09T16:42:17Z"
         }
       ]
     },
@@ -215,7 +229,7 @@
       ],
       "body": "**DESC**: This is proposed together with #8 in Section Data Plane.\r\n**PROBLEM**: ESP doesn't protect the source IP, so a packet could be replayed by changing the source IP.  Can we negotiate an extension to ESP that covers the IP header?  Or could we always send from the contact IP and encode the ASBR ID in the low bits of the SPI?",
       "createdAt": "2022-10-04T09:58:27Z",
-      "updatedAt": "2022-10-20T15:39:16Z",
+      "updatedAt": "2022-11-08T16:09:48Z",
       "closedAt": null,
       "comments": [
         {
@@ -224,6 +238,13 @@
           "body": "We may need the help of ipsecme wg.\r\n\r\nI think the packet sent from the contact IP may not be a proper choice because the contact IP cannot take over the whole AS's traffic. ",
           "createdAt": "2022-10-06T12:55:29Z",
           "updatedAt": "2022-10-06T12:55:29Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "I had originally thought we could do this by negotiating an extension that added the outer IP header to the \"Associated Data\" of the AEAD used for the ESP body.  However, this creates a nonce reuse problem, so it will have to work in a different way.\r\n\r\nI think the better approach will be to use an HKDF to convert the base key (negotiated by Diffie-Hellman in IKEv2) into a session key, using the source IP as input.  This ensures proper key separation between each sending ASBR, and also allows ESP decryption to proceed as usual (just with a different key, which can be derived statelessly).",
+          "createdAt": "2022-11-08T16:09:48Z",
+          "updatedAt": "2022-11-08T16:09:48Z"
         }
       ]
     },
@@ -307,6 +328,68 @@
       "updatedAt": "2022-10-22T03:59:45Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 24,
+      "id": "I_kwDOIGC7185V2g9g",
+      "title": "IDEA: Use the AH reserved field instead of RISAV-AH",
+      "url": "https://github.com/bemasc/draft-xu-risav/issues/24",
+      "state": "OPEN",
+      "author": "bemasc",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Instead of allocating a new IP protocol number for RISAV-AH, another option would be change the value in the AH reserved field, which is 16 bits wide and is currently required to be all zeros.  This would allow us to use standard IPsec AH without risking ambiguity with other uses of AH.\r\n\r\nThis proposal would cost an extra 8 bytes of MTU compared to RISAV-AH, but if the working group is hostile to allocating a new IP protocol number, it could be a useful alternative.",
+      "createdAt": "2022-11-08T14:54:58Z",
+      "updatedAt": "2022-11-09T01:28:00Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "[standard AH header format](https://www.rfc-editor.org/rfc/rfc4302#section-2) and [`Reserved` field description](https://www.rfc-editor.org/rfc/rfc4302#section-2.3).\r\n\r\nYes, I agree. It may become another protocol as we request for RISAV-AH, which ipsecme wg is disinclined. Just let's try to persuade them to modify the `Reserved` field.\r\n\r\nBut it also should deal with the `seq number` field carefully. Or we may keep the `seq num` field as 0 in RISAV. These are, of cause, some little details.",
+          "createdAt": "2022-11-09T01:27:59Z",
+          "updatedAt": "2022-11-09T01:27:59Z"
+        }
+      ]
+    },
+    {
+      "number": 25,
+      "id": "I_kwDOIGC7185V2ysp",
+      "title": "IDEA: MTU handling",
+      "url": "https://github.com/bemasc/draft-xu-risav/issues/25",
+      "state": "OPEN",
+      "author": "bemasc",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "I think we can use \"authenticated rejection\" (#6) to solve the MTU problem:\r\n\r\n1. Each network chooses a \"minimum intended end-to-end MTU\" (`minMTU`), which must be at least 1280.\r\n2. Consider two ASes, **A** and **B**.  Suppose **A** is about to initiate an IKEv2 handshake to **B** (**A** is client, **B** is server).\r\n3. First, **A** checks its Path MTU to **B**.  If this is not known \"a priori\", **A** MUST measure it, and MAY do so using PMTUD on the path from `ACS_A` to `ACS_B`.  We call this value `MTU[A->B]`.\r\n4. If `MTU[A->B] - 24 >= minMTU[A]`, **A** can offer RISAV to B in transport mode.  If `MTU[A->B] - 73 >= minMTU[A]`, it can also offer tunnel mode.\r\n5. When **B** receives an IKEv2 CHILD_SA_INIT message, it performs the same check from its perspective, using `MTU[B->A]`.  It accepts only SAs that are compatible with `minMTU[B]`, and rejects the others.  If none are allowable, they are all rejected.\r\n6. The inter-AS MTU value is sent to all ASBRs as part of the SA, and used as the initial PMTU estimate.\r\n7. If an ASBR receives an ICMP Packet Too Big response whose echoed (i.e. inner) header matches the SA, it adjusts (i.e. reduces) its local MTU estimate.\r\n8. If an ASBR's local MTU falls below `minMTU`, it should inform the ACS.  The ACS can then reduce its estimate of `MTU[X->Y]` and use IKEv2 to [terminate this SA](https://www.rfc-editor.org/rfc/rfc7296#section-1.4.1) if that value is too small.\r\n9. (OPTIONAL?) The ASBR applies [TCP MSS clamping](https://tldp.org/HOWTO/Adv-Routing-HOWTO/lartc.cookbook.mtu-mss.html) based on the current estimate inner MTU.\r\n\r\nIn transport mode, ICMP Packet Too Big responses are forwarded through the ASBR, stripping the echoed RISAV-AH header.  This allows PMTUD to work as usual for the endpoints.\r\n\r\nIn tunnel mode, each ASBR maintains a PMTU estimate for each SA, which is initialized to the `MTU[X->Y]` value used during the handshake.  Packets exceeding this size are dropped and produce a Packet Too Big response from the ASBR.  If the ASBR receives a Packet Too Big response for its own IPsec packets, it reduces its local MTU estimate for this SA.  (This can happen if the initial MTU estimate is wrong for this path, or the path MTU changes.)  ASBRs MAY also run their own PMTUD for their SAs.\r\n\r\nThis arrangement ensures that AS pairs with a consistent inter-AS MTU never reduce the end-to-end MTU below the value that is intended by either AS.  If the MTU is variable or heterogeneous, this arrangement ensures that PMTUD continues to work correctly for endpoints.  If the MTU on any path falls below the required minimum, RISAV will be disabled within ~1 second.  The addition of MSS clamping ensures that non-PMTUD-capable TCP clients don't attempt to use large packets that will not work.\r\n\r\n-----\r\n\r\nMy biggest concern about this approach is that it enables some downgrade attacks:\r\n\r\nA. A transit provider could simply reduce the actual MTU to 1280 in order to cause RISAV to be disabled automatically.\r\nB. An off-path attacker could send a Packet Too Big response that contains a packet from the other AS.\r\n\r\nAttack A is probably acceptable for now (i.e. out of scope).  Attack B is more concerning, and I'm not sure how to mitigate it.",
+      "createdAt": "2022-11-08T15:30:56Z",
+      "updatedAt": "2022-11-09T09:58:11Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Sorry, but the [RFC 7383](https://datatracker.ietf.org/doc/html/rfc7383) has discussed this fragmentation problem in IKEv2. This PMTUD should start after IKE_SA_INIT as it says in [Section 2.5.2](https://datatracker.ietf.org/doc/html/rfc7383#section-2.5.2), not CHILD_SA_INIT which I didn't find in [IKEv2 protocol | RFC 7296](https://www.rfc-editor.org/rfc/rfc7296).\r\n\r\nIt says in [RFC 7383](https://datatracker.ietf.org/doc/html/rfc7383) that in most cases, only the IKE_AUTH phase needs the PMTU probe. And shall we distinguish IPv4 and IPv6 for the MTU? The limitation of 1280 B is the minimum MTU for IPv6. For IPv4, the minMTU is 576 B described in [Section 2.5.1 | RFC 7383](https://datatracker.ietf.org/doc/html/rfc7383#section-2.5.1).",
+          "createdAt": "2022-11-09T03:34:34Z",
+          "updatedAt": "2022-11-09T03:34:34Z"
+        },
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I also find there is an active draft for [IKEv2 MTU dectection](https://datatracker.ietf.org/doc/draft-liu-ipsecme-ikev2-mtu-dect/).\r\n\r\nWell in the data plane, we don't modify the AH/ESP header if we replace RISAV-AH with the standard AH (#24), so we may use the PMTUD directly or the traditional configurations for IPsec. In other words, I think RISAV is still a standard IPsec in the data plane.\r\n1. In transport mode, if we still use the original AH and AH's ICV field to carry the packet tag, no more fields are added.\r\n2. In tunnel mode, the ESP tunnel format is also the same as the original ESP.\r\n\r\nAnd here is what Cisco recommends for the MTU configurations of GRE + IPsec in IPv4 fragmentation, which are some best current practices I think. [pmtud-ipfrag](https://www.cisco.com/c/en/us/support/docs/ip/generic-routing-encapsulation-gre/25885-pmtud-ipfrag.html).",
+          "createdAt": "2022-11-09T06:29:16Z",
+          "updatedAt": "2022-11-09T06:29:16Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "> And shall we distinguish IPv4 and IPv6 for the MTU?\r\n\r\nYes, I was just using IPv6 numbers for simplicity.\r\n\r\n> [RFC 7383](https://datatracker.ietf.org/doc/html/rfc7383) has discussed this fragmentation problem in IKEv2\r\n\r\nInteresting, thanks.  We should definitely consider RFC 7383 Section 2.5.2 when writing about PMTU discovery.  However, I think the requirements here are different, because I am proposing to use the resulting MTU estimate on the data plane.  For example, RFC 7383 recommends using very approximate PMTUD, because only a small amount of data is transferred, but in this case the discovered MTU will apply to a large amount of data.\r\n\r\n> I think RISAV is still a standard IPsec in the data plane.\r\n\r\nYes, this MTU logic doesn't alter the ordinary operation of the data plane (although the proposed ICMP rewriting for AH is novel).\r\n\r\n> And here is what Cisco recommends for the MTU\r\n\r\nThanks, that reminds me about TCP MSS.  I've edited the proposal to include MSS clamping.",
+          "createdAt": "2022-11-09T09:58:10Z",
+          "updatedAt": "2022-11-09T09:58:10Z"
+        }
+      ]
     }
   ],
   "pulls": [
