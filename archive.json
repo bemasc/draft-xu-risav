@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-11-10T01:23:35.044705+00:00",
+  "timestamp": "2022-11-13T01:22:10.285631+00:00",
   "repo": "bemasc/draft-xu-risav",
   "labels": [
     {
@@ -109,7 +109,7 @@
       ],
       "body": "**DESC**: This is about how to disable RISAV normally and orderly.\r\n**TODO**: Discuss changes to the contact IP, check if there are any race conditions between\r\nactivation and deactivation, IKEv2 handshakes in progress, SA expiration, etc.\r\n**OPEN QUESTION**: Does IKEv2 have an authenticated permanent rejection option that would help here?",
       "createdAt": "2022-10-04T09:56:19Z",
-      "updatedAt": "2022-11-09T16:42:17Z",
+      "updatedAt": "2022-11-11T01:12:07Z",
       "closedAt": null,
       "comments": [
         {
@@ -139,6 +139,27 @@
           "body": "Some other possibilities mentioned during the IPSECME discussion:\r\n* Using DELETE to immediately delete the initial child SA.\r\n* NO_ADDITIONAL_SAS (means \"no more child SAs on this IKE SA\")\r\n* Somehow deliberately failing the IKE_AUTH step (e.g., signing an invalid keyshare response) to prevent the creation of the initial child SA.",
           "createdAt": "2022-11-09T16:42:17Z",
           "updatedAt": "2022-11-09T16:42:17Z"
+        },
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "It looks like we don't need to design such an option. It is enough to reuse these already existing SAs for disabling IPsec/IKE.\r\nWe may need to read [IKEv2 - RFC 7296](https://datatracker.ietf.org/doc/html/rfc7296) in depth.\r\n\r\nAnd except for enabling and disabling, we also need to consider the fast fail and fast reconnect in the control plane I think. That is because the `testing` field may be set to `true`. At that time, the ACS is not fully reliable. When ACS is down, the SA generation may also fail before ACS reboots. So how to roll back to ordinary operation is a question.\r\n\r\nI think we can design a `green channel` that will be used between two ACSes. In this channel, only the contact IP will not be checked with the RISAV header. That means the communication between the contact IP is always in the ordinary way when the `green channel` is working. But this seems to be infeasible in tunnel mode as the tunnel is built with the contact IP.\r\n",
+          "createdAt": "2022-11-10T03:58:52Z",
+          "updatedAt": "2022-11-10T03:58:52Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "I think the `green channel` is a good idea, to avoid situations where RISAV has been turned on but cannot be turned off.  I don't think there's any compatibility problem with tunnel mode.  We can simply say that \"RISAV IKEv2 is not subject to RISAV\".",
+          "createdAt": "2022-11-10T10:32:17Z",
+          "updatedAt": "2022-11-10T10:32:17Z"
+        },
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "OK, I will update it later.",
+          "createdAt": "2022-11-11T01:12:07Z",
+          "updatedAt": "2022-11-11T01:12:07Z"
         }
       ]
     },
@@ -309,9 +330,17 @@
       ],
       "body": "We have requested to join the IETF 115 meeting. The following questions are issued by Yoav Nir, the chair of ipsecme wg.\r\n1. While your draft makes use of IPsec, it\u2019s also using RPKI.  Perhaps before (or in addition to) presenting it at IPsecME, it should also be presented at SECDISPATCH.\r\n2. You are using multi-sender SAs. Perhaps re-use G-IKEv2 rather than inventing your own alternatives to the keying protocol and to AH.\r\n3. You are using AH.  AH is all but deprecated in IPsec.",
       "createdAt": "2022-10-21T12:04:40Z",
-      "updatedAt": "2022-10-21T13:07:56Z",
+      "updatedAt": "2022-11-10T03:14:45Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "[minutes from ipsecme wg for IETF 115](https://datatracker.ietf.org/meeting/115/materials/minutes-115-ipsecme-202211091500-00)",
+          "createdAt": "2022-11-10T03:14:45Z",
+          "updatedAt": "2022-11-10T03:14:45Z"
+        }
+      ]
     },
     {
       "number": 23,
@@ -365,7 +394,7 @@
       "labels": [],
       "body": "I think we can use \"authenticated rejection\" (#6) to solve the MTU problem:\r\n\r\n1. Each network chooses a \"minimum intended end-to-end MTU\" (`minMTU`), which must be at least 1280.\r\n2. Consider two ASes, **A** and **B**.  Suppose **A** is about to initiate an IKEv2 handshake to **B** (**A** is client, **B** is server).\r\n3. First, **A** checks its Path MTU to **B**.  If this is not known \"a priori\", **A** MUST measure it, and MAY do so using PMTUD on the path from `ACS_A` to `ACS_B`.  We call this value `MTU[A->B]`.\r\n4. If `MTU[A->B] - 24 >= minMTU[A]`, **A** can offer RISAV to B in transport mode.  If `MTU[A->B] - 73 >= minMTU[A]`, it can also offer tunnel mode.\r\n5. When **B** receives an IKEv2 CHILD_SA_INIT message, it performs the same check from its perspective, using `MTU[B->A]`.  It accepts only SAs that are compatible with `minMTU[B]`, and rejects the others.  If none are allowable, they are all rejected.\r\n6. The inter-AS MTU value is sent to all ASBRs as part of the SA, and used as the initial PMTU estimate.\r\n7. If an ASBR receives an ICMP Packet Too Big response whose echoed (i.e. inner) header matches the SA, it adjusts (i.e. reduces) its local MTU estimate.\r\n8. If an ASBR's local MTU falls below `minMTU`, it should inform the ACS.  The ACS can then reduce its estimate of `MTU[X->Y]` and use IKEv2 to [terminate this SA](https://www.rfc-editor.org/rfc/rfc7296#section-1.4.1) if that value is too small.\r\n9. (OPTIONAL?) The ASBR applies [TCP MSS clamping](https://tldp.org/HOWTO/Adv-Routing-HOWTO/lartc.cookbook.mtu-mss.html) based on the current estimate inner MTU.\r\n\r\nIn transport mode, ICMP Packet Too Big responses are forwarded through the ASBR, stripping the echoed RISAV-AH header.  This allows PMTUD to work as usual for the endpoints.\r\n\r\nIn tunnel mode, each ASBR maintains a PMTU estimate for each SA, which is initialized to the `MTU[X->Y]` value used during the handshake.  Packets exceeding this size are dropped and produce a Packet Too Big response from the ASBR.  If the ASBR receives a Packet Too Big response for its own IPsec packets, it reduces its local MTU estimate for this SA.  (This can happen if the initial MTU estimate is wrong for this path, or the path MTU changes.)  ASBRs MAY also run their own PMTUD for their SAs.\r\n\r\nThis arrangement ensures that AS pairs with a consistent inter-AS MTU never reduce the end-to-end MTU below the value that is intended by either AS.  If the MTU is variable or heterogeneous, this arrangement ensures that PMTUD continues to work correctly for endpoints.  If the MTU on any path falls below the required minimum, RISAV will be disabled within ~1 second.  The addition of MSS clamping ensures that non-PMTUD-capable TCP clients don't attempt to use large packets that will not work.\r\n\r\n-----\r\n\r\nMy biggest concern about this approach is that it enables some downgrade attacks:\r\n\r\nA. A transit provider could simply reduce the actual MTU to 1280 in order to cause RISAV to be disabled automatically.\r\nB. An off-path attacker could send a Packet Too Big response that contains a packet from the other AS.\r\n\r\nAttack A is probably acceptable for now (i.e. out of scope).  Attack B is more concerning, and I'm not sure how to mitigate it.",
       "createdAt": "2022-11-08T15:30:56Z",
-      "updatedAt": "2022-11-09T09:58:11Z",
+      "updatedAt": "2022-11-11T09:32:50Z",
       "closedAt": null,
       "comments": [
         {
@@ -388,8 +417,45 @@
           "body": "> And shall we distinguish IPv4 and IPv6 for the MTU?\r\n\r\nYes, I was just using IPv6 numbers for simplicity.\r\n\r\n> [RFC 7383](https://datatracker.ietf.org/doc/html/rfc7383) has discussed this fragmentation problem in IKEv2\r\n\r\nInteresting, thanks.  We should definitely consider RFC 7383 Section 2.5.2 when writing about PMTU discovery.  However, I think the requirements here are different, because I am proposing to use the resulting MTU estimate on the data plane.  For example, RFC 7383 recommends using very approximate PMTUD, because only a small amount of data is transferred, but in this case the discovered MTU will apply to a large amount of data.\r\n\r\n> I think RISAV is still a standard IPsec in the data plane.\r\n\r\nYes, this MTU logic doesn't alter the ordinary operation of the data plane (although the proposed ICMP rewriting for AH is novel).\r\n\r\n> And here is what Cisco recommends for the MTU\r\n\r\nThanks, that reminds me about TCP MSS.  I've edited the proposal to include MSS clamping.",
           "createdAt": "2022-11-09T09:58:10Z",
           "updatedAt": "2022-11-09T09:58:10Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "I mentioned earlier that Packet Too Big (PTB) ICMP messages are easily forged by an off-path attacker.  During normal PMTUD, PTB forgery is prevented by the entropy of the original packet, which must be echoed in the response.  If the PTB message doesn't match a packet that was recently sent, it is ignored.  The ASBR cannot apply this defense, because it has no memory of the packet that was sent (which may not have even passed through this ASBR, if ECMP clustering or multicore implementation is in use).\r\n\r\nMaybe a better solution is to say: if an ASBR receives a PTB response indicating a PMTU that is less than the current MTU estimate, it performs its own explicit PMTUD.  This is not vulnerable to off-path attacks.  However, it is somewhat unusual: we want the \"inter-AS\" PMTU, without regard to the packet handling inside the target AS.  Therefore, the measurement proceeds as follows:\r\n\r\n1. The sending ASBR runs a traceroute to the target IP listed in the PTB response.  This traceroute starts at TTL=1 and stops once it receives a response from an IP address inside the target AS.  This is presumed to be the receiving ASBR.\r\n2. The sending ASBR performs PMTUD to this receiving ASBR\r\n\r\nThis PMTU value is the one used to update the current PMTU estimate, etc.",
+          "createdAt": "2022-11-10T15:08:01Z",
+          "updatedAt": "2022-11-10T21:26:08Z"
+        },
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "When I send a traceroute packet, I may get a private IP address. I try to traceroute google.com with a [online mtr](https://traceroute-online.com/mtr/), and the result shows that the first 4 response IPs are all private IPs. Of course, private IP must be used inside the local network. I don't know if it is a particular case in CERNET or just all the same in most ISPs' networks. Maybe I should also compile a mtr in my local machine :joy:.\r\n\r\n![image](https://user-images.githubusercontent.com/42705918/201243142-e72a9512-6b67-4d95-8d12-992f3e47d052.png)\r\n\r\n",
+          "createdAt": "2022-11-11T02:23:20Z",
+          "updatedAt": "2022-11-11T02:23:20Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "In this case, the sending ASBR is using a public source IP address, so the entire traceroute will return public IP addresses.",
+          "createdAt": "2022-11-11T09:32:50Z",
+          "updatedAt": "2022-11-11T09:32:50Z"
         }
       ]
+    },
+    {
+      "number": 26,
+      "id": "I_kwDOIGC7185WGv55",
+      "title": "Allow v6-only deployments",
+      "url": "https://github.com/bemasc/draft-xu-risav/issues/26",
+      "state": "OPEN",
+      "author": "bemasc",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Right now, we say that ASes MUST public a contact IP for every supported address family.  I think it's probably better to say that RISAV only applies to the address families for which there is a contact IP.\r\n\r\nThis would allow an AS to activate RISAV only for IPv6 (or only for IPv4), in case this is more convenient given their network equipment.",
+      "createdAt": "2022-11-10T21:47:27Z",
+      "updatedAt": "2022-11-10T21:47:27Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
