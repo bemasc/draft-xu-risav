@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-11-13T01:22:10.285631+00:00",
+  "timestamp": "2022-11-17T01:17:56.769282+00:00",
   "repo": "bemasc/draft-xu-risav",
   "labels": [
     {
@@ -454,6 +454,22 @@
       "body": "Right now, we say that ASes MUST public a contact IP for every supported address family.  I think it's probably better to say that RISAV only applies to the address families for which there is a contact IP.\r\n\r\nThis would allow an AS to activate RISAV only for IPv6 (or only for IPv4), in case this is more convenient given their network equipment.",
       "createdAt": "2022-11-10T21:47:27Z",
       "updatedAt": "2022-11-10T21:47:27Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 27,
+      "id": "I_kwDOIGC7185WbbjF",
+      "title": "Add section on RFC 8200 compliance",
+      "url": "https://github.com/bemasc/draft-xu-risav/issues/27",
+      "state": "OPEN",
+      "author": "bemasc",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "We should add a section discussing RISAV's compliance with RFC 8200.  Specifically, [Section 4](https://www.rfc-editor.org/rfc/rfc8200#section-4) says:\r\n\r\n>   Extension headers (except for the Hop-by-Hop Options header) are not\r\n>   processed, inserted, or deleted by any node along a packet's delivery\r\n>   path, until the packet reaches the node (or each of the set of nodes,\r\n>   in the case of multicast) identified in the Destination Address field\r\n>   of the IPv6 header.\r\n\r\nThis looks like it's not compatible with Transport Mode.  I see a few options:\r\n\r\n1. Update RFC 8200 (e.g. to say extension headers can be inserted by one node if they are later deleted)\r\n2. Remove Transport Mode\r\n3. Argue that Transport Mode actually is somehow allowed under RFC 8200.  (Notably, this paragraph is not normative, so it could be taken as merely a description of common practice, rather than a strict requirement.)",
+      "createdAt": "2022-11-15T16:09:44Z",
+      "updatedAt": "2022-11-15T16:09:44Z",
       "closedAt": null,
       "comments": []
     }
