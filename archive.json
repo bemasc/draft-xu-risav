@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-11-17T01:17:56.769282+00:00",
+  "timestamp": "2022-11-27T01:16:22.173195+00:00",
   "repo": "bemasc/draft-xu-risav",
   "labels": [
     {
@@ -453,9 +453,17 @@
       "labels": [],
       "body": "Right now, we say that ASes MUST public a contact IP for every supported address family.  I think it's probably better to say that RISAV only applies to the address families for which there is a contact IP.\r\n\r\nThis would allow an AS to activate RISAV only for IPv6 (or only for IPv4), in case this is more convenient given their network equipment.",
       "createdAt": "2022-11-10T21:47:27Z",
-      "updatedAt": "2022-11-10T21:47:27Z",
+      "updatedAt": "2022-11-24T08:38:07Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "That's good. We need that. It should allow RISAV to work only for IPv4 or IPv6 networks.",
+          "createdAt": "2022-11-24T08:38:07Z",
+          "updatedAt": "2022-11-24T08:38:07Z"
+        }
+      ]
     },
     {
       "number": 27,
@@ -469,9 +477,17 @@
       "labels": [],
       "body": "We should add a section discussing RISAV's compliance with RFC 8200.  Specifically, [Section 4](https://www.rfc-editor.org/rfc/rfc8200#section-4) says:\r\n\r\n>   Extension headers (except for the Hop-by-Hop Options header) are not\r\n>   processed, inserted, or deleted by any node along a packet's delivery\r\n>   path, until the packet reaches the node (or each of the set of nodes,\r\n>   in the case of multicast) identified in the Destination Address field\r\n>   of the IPv6 header.\r\n\r\nThis looks like it's not compatible with Transport Mode.  I see a few options:\r\n\r\n1. Update RFC 8200 (e.g. to say extension headers can be inserted by one node if they are later deleted)\r\n2. Remove Transport Mode\r\n3. Argue that Transport Mode actually is somehow allowed under RFC 8200.  (Notably, this paragraph is not normative, so it could be taken as merely a description of common practice, rather than a strict requirement.)",
       "createdAt": "2022-11-15T16:09:44Z",
-      "updatedAt": "2022-11-15T16:09:44Z",
+      "updatedAt": "2022-11-24T09:13:29Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "BasilGuo",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yes, we should guarantee RISAV compliance with RFC 8200.\r\n\r\nIt seems not so easy to update a mature protocol. The modification to IPsec AH is beset with difficulties in ipsecme working group. I think it is also the same at the 6man working group. :joy: \r\n\r\nThe insertion action at an extra node may bring other problems we don't see as this violated to RFC 8200 and the communities are opposed to it. So it may be a compromised choice to remove transport mode.\r\n\r\nThere is also a problem with the Tunnel Mode. The tunnel we set now is established between ASBR and ACS in different ASes. So the problem is whether it is allowed to process the IPsec header at the ASBRs all the time without the consent of ACS. \r\n\r\nFor example, we have `AS A` and `AS B` and with `ACS a`, `ACS b`, `ASBR Ra`, and `ASBR Rb` inside separately. Now a packet is sent from `AS A` to `AS B`. It will use the tunnel between `Ra` and `ACS b` while the `Rb` will represent `ACS b` to process the IPsec header in the packet and sends it to the destination host in `AS B`.\r\n```\r\n+---------+                +---------+\r\n|   AS A  |                |  AS  B  |\r\n|        #########   #########       |\r\n| ACS a  #ASBR Ra#---#ASBR Rb# ACS b |\r\n|        #########   #########       |\r\n+---------+                +---------+\r\n```\r\nIf so, nothing to disturb. Otherwise, we also should rethink the tunnel mode. :joy: ",
+          "createdAt": "2022-11-24T09:13:28Z",
+          "updatedAt": "2022-11-24T09:13:28Z"
+        }
+      ]
     }
   ],
   "pulls": [
